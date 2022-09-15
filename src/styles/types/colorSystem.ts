@@ -115,6 +115,7 @@ export interface PaletteBackground {
   level2: string;
   level3: string;
   tooltip: string;
+  backdrop: string;
 }
 
 export interface ColorPalettePropOverrides {}

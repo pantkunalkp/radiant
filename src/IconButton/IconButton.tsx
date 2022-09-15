@@ -49,7 +49,7 @@ const useUtilityClasses = (
   return composedClasses;
 };
 
-const IconButtonRoot = styled("button", {
+export const IconButtonRoot = styled("button", {
   name: "RadIconButton",
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
@@ -57,6 +57,7 @@ const IconButtonRoot = styled("button", {
   ({ theme, ownerState }) => [
     {
       "--Icon-margin": "initial", // reset the icon's margin.
+      "--CircularProgress-size": "var(--Icon-fontSize)",
       ...(ownerState.size === "sm" && {
         "--Icon-fontSize": "1rem", //1.25
         minWidth: "var(--IconButton-size, 2rem)", // use min-width instead of height to make the button resilient to its content

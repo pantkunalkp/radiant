@@ -131,3 +131,15 @@ export * from "./MenuItem";
 
 export { default as MenuList } from "./MenuList";
 export * from "./MenuList";
+
+export { default as Modal } from "./Modal";
+export * from "./Modal";
+
+export { default as ModalClose } from "./ModalClose";
+export * from "./ModalClose";
+
+export { default as ModalDialog } from "./ModalDialog";
+export * from "./ModalDialog";
+
+export { default as CircularProgress } from "./CircularProgress";
+export * from "./CircularProgress";

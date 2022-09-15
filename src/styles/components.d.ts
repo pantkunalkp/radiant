@@ -66,6 +66,11 @@ import { MenuListProps, MenuListSlot } from "../MenuList/MenuListProps";
 import { MenuItemProps, MenuItemSlot } from "../MenuItem/MenuItemProps";
 import { TabsProps, TabsOwnerState, TabsSlot } from "../Tabs/TabsProps";
 import {
+  CircularProgressProps,
+  CircularProgressOwnerState,
+  CircularProgressSlot,
+} from "../CircularProgress/CircularProgressProps";
+import {
   TabListProps,
   TabListOwnerState,
   TabListSlot,
@@ -81,6 +86,17 @@ import {
   TextareaOwnerState,
   TextareaSlot,
 } from "../Textarea/TextareaProps";
+import { ModalProps, ModalOwnerState, ModalSlot } from "../Modal/ModalProps";
+import {
+  ModalCloseProps,
+  ModalCloseOwnerState,
+  ModalCloseSlot,
+} from "../ModalClose/ModalCloseProps";
+import {
+  ModalDialogProps,
+  ModalDialogOwnerState,
+  ModalDialogSlot,
+} from "../ModalDialog/ModalDialogProps";
 
 export type OverridesStyleRules<
   ClassKey extends string = string,
@@ -332,6 +348,34 @@ export interface Components<Theme = unknown> {
     styleOverrides?: OverridesStyleRules<
       TextareaSlot,
       TextareaOwnerState,
+      Theme
+    >;
+  };
+  RadModal?: {
+    defaultProps?: Partial<ModalProps>;
+    styleOverrides?: OverridesStyleRules<ModalSlot, ModalOwnerState, Theme>;
+  };
+  RadModalClose?: {
+    defaultProps?: Partial<ModalCloseProps>;
+    styleOverrides?: OverridesStyleRules<
+      ModalCloseSlot,
+      ModalCloseOwnerState,
+      Theme
+    >;
+  };
+  RadModalDialog?: {
+    defaultProps?: Partial<ModalDialogProps>;
+    styleOverrides?: OverridesStyleRules<
+      ModalDialogSlot,
+      ModalDialogOwnerState,
+      Theme
+    >;
+  };
+  RadCircularProgress?: {
+    defaultProps?: Partial<CircularProgressProps>;
+    styleOverrides?: OverridesStyleRules<
+      CircularProgressSlot,
+      CircularProgressOwnerState,
       Theme
     >;
   };

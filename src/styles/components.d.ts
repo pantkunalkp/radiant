@@ -98,6 +98,17 @@ import {
   ModalDialogSlot,
 } from "../ModalDialog/ModalDialogProps";
 
+import {
+  ModalDialogTitleProps,
+  ModalDialogTitleOwnerState,
+  ModalDialogTitleSlot,
+} from "../ModalDialogTitle/ModalDialogTitleProps";
+import {
+  ModalDialogDescriptionProps,
+  ModalDialogDescriptionOwnerState,
+  ModalDialogDescriptionSlot,
+} from "../ModalDialogDescription/ModalDialogDescriptionProps";
+
 export type OverridesStyleRules<
   ClassKey extends string = string,
   ComponentProps = Record<string, unknown>,
@@ -376,6 +387,22 @@ export interface Components<Theme = unknown> {
     styleOverrides?: OverridesStyleRules<
       CircularProgressSlot,
       CircularProgressOwnerState,
+      Theme
+    >;
+  };
+  RadModalDialogTitle?: {
+    defaultProps?: Partial<ModalDialogTitleProps>;
+    styleOverrides?: OverridesStyleRules<
+      ModalDialogTitleSlot,
+      ModalDialogTitleOwnerState,
+      Theme
+    >;
+  };
+  RadModalDialogDescription?: {
+    defaultProps?: Partial<ModalDialogDescriptionProps>;
+    styleOverrides?: OverridesStyleRules<
+      ModalDialogDescriptionSlot,
+      ModalDialogDescriptionOwnerState,
       Theme
     >;
   };

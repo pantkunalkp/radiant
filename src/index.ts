@@ -141,5 +141,11 @@ export * from "./ModalClose";
 export { default as ModalDialog } from "./ModalDialog";
 export * from "./ModalDialog";
 
+export { default as ModalDialogTitle } from "./ModalDialogTitle";
+export * from "./ModalDialogTitle";
+
+export { default as ModalDialogDescription } from "./ModalDialogDescription";
+export * from "./ModalDialogDescription";
+
 export { default as CircularProgress } from "./CircularProgress";
 export * from "./CircularProgress";

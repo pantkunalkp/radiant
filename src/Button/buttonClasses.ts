@@ -1,4 +1,4 @@
-import { generateUtilityClass, generateUtilityClasses } from "../className";
+import { generateUtilityClass, generateUtilityClasses } from '../className';
 
 export interface ButtonClasses {
   /** Styles applied to the root element. */
@@ -15,6 +15,8 @@ export interface ButtonClasses {
   colorSuccess: string;
   /** Styles applied to the root element if `color="warning"`. */
   colorWarning: string;
+  /** Styles applied to the root element when color inversion is triggered. */
+  colorContext: string;
   /** Styles applied to the root element if `variant="plain"`. */
   variantPlain: string;
   /** Styles applied to the root element if `variant="outlined"`. */
@@ -48,31 +50,32 @@ export interface ButtonClasses {
 export type ButtonClassKey = keyof ButtonClasses;
 
 export function getButtonUtilityClass(slot: string): string {
-  return generateUtilityClass("RadButton", slot);
+  return generateUtilityClass('RadButton', slot);
 }
 
-const buttonClasses: ButtonClasses = generateUtilityClasses("RadButton", [
-  "root",
-  "colorPrimary",
-  "colorNeutral",
-  "colorDanger",
-  "colorInfo",
-  "colorSuccess",
-  "colorWarning",
-  "variantPlain",
-  "variantOutlined",
-  "variantSoft",
-  "variantSolid",
-  "focusVisible",
-  "disabled",
-  "sizeSm",
-  "sizeMd",
-  "sizeLg",
-  "fullWidth",
-  "startDecorator",
-  "endDecorator",
-  "loading",
-  "loadingIndicatorCenter",
+const buttonClasses: ButtonClasses = generateUtilityClasses('RadButton', [
+  'root',
+  'colorPrimary',
+  'colorNeutral',
+  'colorDanger',
+  'colorInfo',
+  'colorSuccess',
+  'colorWarning',
+  'colorContext',
+  'variantPlain',
+  'variantOutlined',
+  'variantSoft',
+  'variantSolid',
+  'focusVisible',
+  'disabled',
+  'sizeSm',
+  'sizeMd',
+  'sizeLg',
+  'fullWidth',
+  'startDecorator',
+  'endDecorator',
+  'loading',
+  'loadingIndicatorCenter',
 ]);
 
 export default buttonClasses;

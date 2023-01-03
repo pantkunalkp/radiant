@@ -1,13 +1,15 @@
-import { OverridableStringUnion, OverrideProps } from "@mui/types";
-import * as React from "react";
-import { ColorPaletteProp, SxProps, VariantProp } from "../styles/types";
 
-export type SheetSlot = "root";
+
+import { OverridableStringUnion, OverrideProps } from '@mui/types';
+import * as React from 'react';
+import { ColorPaletteProp, SxProps, VariantProp, ApplyColorInversion } from '../styles/types';
+
+export type SheetSlot = 'root';
 
 export interface SheetPropsColorOverrides {}
 export interface SheetPropsVariantOverrides {}
 
-export interface SheetTypeMap<P = {}, D extends React.ElementType = "div"> {
+export interface SheetTypeMap<P = {}, D extends React.ElementType = 'div'> {
   props: P & {
     /**
      * The content of the component.
@@ -32,14 +34,13 @@ export interface SheetTypeMap<P = {}, D extends React.ElementType = "div"> {
      * @default 'plain'
      */
     variant?: OverridableStringUnion<VariantProp, SheetPropsVariantOverrides>;
-    shadow?: "sm" | "md" | "lg";
   };
   defaultComponent: D;
 }
 
 export type SheetProps<
-  D extends React.ElementType = SheetTypeMap["defaultComponent"],
-  P = { component?: React.ElementType }
+  D extends React.ElementType = SheetTypeMap['defaultComponent'],
+  P = { component?: React.ElementType },
 > = OverrideProps<SheetTypeMap<P, D>, D>;
 
-export interface SheetOwnerState extends SheetProps {}
+export interface SheetOwnerState extends ApplyColorInversion<SheetProps> {}

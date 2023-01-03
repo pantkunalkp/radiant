@@ -1,5 +1,5 @@
-import { useThemeProps as systemUseThemeProps } from "@mui/system";
-import defaultTheme from "./defaultTheme";
+import { useThemeProps as systemUseThemeProps } from '@mui/system';
+import defaultTheme from './defaultTheme';
 
 export default function useThemeProps<T extends {}>({
   props,
@@ -8,9 +8,5 @@ export default function useThemeProps<T extends {}>({
   props: T & {};
   name: string;
 }) {
-  return systemUseThemeProps({
-    props,
-    name,
-    defaultTheme: { ...defaultTheme, components: {} },
-  });
+  return systemUseThemeProps({ props, name, defaultTheme: { ...defaultTheme, components: {} } });
 }

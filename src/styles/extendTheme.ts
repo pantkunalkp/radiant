@@ -6,25 +6,20 @@ import {
   createSpacing,
   unstable_createGetCssVar as systemCreateGetCssVar,
   colorChannel,
-} from "@mui/system";
-import colors from "../colors";
-import { DefaultColorScheme, ExtendedColorScheme } from "./types/colorScheme";
-import {
-  ColorSystem,
-  ColorPaletteProp,
-  PaletteRange,
-} from "./types/colorSystem";
-import { Focus } from "./types/focus";
-import { TypographySystem, FontSize } from "./types/typography";
-import {
-  Variants,
-  VariantOverrides,
-  ColorInversionConfig,
-} from "./types/variants";
-import { Theme, ThemeCssVar, ThemeScales } from "./types";
-import { Components } from "./components";
-import { generateUtilityClass } from "../className";
-import { createVariant } from "./variantUtils";
+  unstable_styleFunctionSx as styleFunctionSx,
+  SxConfig,
+} from '@mui/system';
+import defaultSxConfig from './sxConfig';
+import colors from '../colors';
+import { DefaultColorScheme, ExtendedColorScheme } from './types/colorScheme';
+import { ColorSystem, ColorPaletteProp, PaletteRange } from './types/colorSystem';
+import { Focus } from './types/focus';
+import { TypographySystem, FontSize } from './types/typography';
+import { Variants, ColorInversion, ColorInversionConfig } from './types/variants';
+import { Theme, ThemeCssVar, ThemeScales, SxProps } from './types';
+import { Components } from './components';
+import { generateUtilityClass } from '../className';
+import { createVariant } from './variantUtils';
 
 type Partial2Level<T> = {
   [K in keyof T]?: T[K] extends Record<any, any>
@@ -62,14 +57,15 @@ export interface CssVarsThemeOptions extends Partial2Level<ThemeScales> {
   focus?: Partial<Focus>;
   typography?: Partial<TypographySystem>;
   variants?: Partial2Level<Variants>;
-  colorInversion?: Partial2Level<VariantOverrides>;
+  colorInversion?:
+    | Partial2Level<ColorInversion>
+    | ((theme: Theme) => Partial2Level<ColorInversion>);
   colorInversionConfig?: ColorInversionConfig;
   breakpoints?: BreakpointsOptions;
   spacing?: SpacingOptions;
   components?: Components<Theme>;
-  colorSchemes?: Partial<
-    Record<DefaultColorScheme | ExtendedColorScheme, ColorSystemOptions>
-  >;
+  colorSchemes?: Partial<Record<DefaultColorScheme | ExtendedColorScheme, ColorSystemOptions>>;
+  unstable_sxConfig?: SxConfig;
 }
 
 export const createGetCssVar = (cssVarPrefix = "rad") =>
@@ -235,6 +231,7 @@ export default function extendTheme(themeOptions?: CssVarsThemeOptions): Theme {
       background: {
         body: getCssVar("palette-common-white"),
         surface: getCssVar("palette-common-white"),
+        popup: getCssVar('palette-common-white'),
         level1: getCssVar("palette-neutral-50"),
         level2: getCssVar("palette-neutral-100"),
         level3: getCssVar("palette-neutral-200"),
@@ -334,6 +331,7 @@ export default function extendTheme(themeOptions?: CssVarsThemeOptions): Theme {
       background: {
         body: getCssVar("palette-neutral-900"),
         surface: getCssVar("palette-common-black"),
+        popup: getCssVar('palette-neutral-800'),
         level1: getCssVar("palette-neutral-800"),
         level2: getCssVar("palette-neutral-700"),
         level3: getCssVar("palette-neutral-600"),
@@ -604,16 +602,11 @@ export default function extendTheme(themeOptions?: CssVarsThemeOptions): Theme {
   };
 
   const { colorSchemes, ...mergedScales } = scalesInput
-    ? deepmerge(defaultScales, scalesInput)
-    : defaultScales;
+  ? deepmerge(defaultScales, scalesInput)
+  : defaultScales;
 
-  const { palette: firstColorSchemePalette } =
-    Object.entries(colorSchemes)[0][1];
-  const variantInput = {
-    palette: firstColorSchemePalette,
-    cssVarPrefix,
-    getCssVar,
-  };
+const { palette: firstColorSchemePalette } = Object.entries(colorSchemes)[0][1];
+const variantInput = { palette: firstColorSchemePalette, cssVarPrefix, getCssVar };
 
   const theme = {
     colorSchemes,
@@ -699,15 +692,13 @@ export default function extendTheme(themeOptions?: CssVarsThemeOptions): Theme {
   /**
    * Color channels generation
    */
-  function attachColorChannels(
-    palette: Record<ColorPaletteProp, PaletteRange>
-  ) {
+  function attachColorChannels(palette: Record<ColorPaletteProp, PaletteRange>) {
     (Object.keys(palette) as Array<ColorPaletteProp>).forEach((key) => {
       const channelMapping = {
         // Need type casting due to module augmentation inside the repo
-        main: "500" as keyof PaletteRange,
-        light: "200" as keyof PaletteRange,
-        dark: "800" as keyof PaletteRange,
+        main: '500' as keyof PaletteRange,
+        light: '200' as keyof PaletteRange,
+        dark: '800' as keyof PaletteRange,
       };
       if (!palette[key].mainChannel && palette[key][channelMapping.main]) {
         palette[key].mainChannel = colorChannel(
@@ -734,6 +725,16 @@ export default function extendTheme(themeOptions?: CssVarsThemeOptions): Theme {
   ).forEach(([, colorSystem]) => {
     attachColorChannels(colorSystem.palette);
   });
+  theme.unstable_sxConfig = {
+    ...defaultSxConfig,
+    ...themeOptions?.unstable_sxConfig,
+  };
+  theme.unstable_sx = function sx(props: SxProps) {
+    return styleFunctionSx({
+      sx: props,
+      theme: this,
+    });
+  };
 
   return theme;
 }

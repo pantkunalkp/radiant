@@ -1,10 +1,7 @@
-import * as React from "react";
-import {
-  ThemeProvider as SystemThemeProvider,
-  useTheme as useSystemTheme,
-} from "@mui/system";
-import defaultTheme, { getThemeWithVars } from "./defaultTheme";
-import type { CssVarsThemeOptions } from "./extendTheme";
+import * as React from 'react';
+import { ThemeProvider as SystemThemeProvider, useTheme as useSystemTheme } from '@mui/system';
+import defaultTheme, { getThemeWithVars } from './defaultTheme';
+import type { CssVarsThemeOptions } from './extendTheme';
 
 export const useTheme = () => {
   return useSystemTheme(defaultTheme);
@@ -17,9 +14,7 @@ export default function ThemeProvider({
   theme?: CssVarsThemeOptions;
 }>) {
   return (
-    <SystemThemeProvider
-      theme={themeInput ? getThemeWithVars(themeInput) : defaultTheme}
-    >
+    <SystemThemeProvider theme={themeInput ? getThemeWithVars(themeInput) : defaultTheme}>
       {children}
     </SystemThemeProvider>
   );

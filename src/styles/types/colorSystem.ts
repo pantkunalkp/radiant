@@ -1,4 +1,5 @@
-import { OverridableStringUnion, Simplify } from "@mui/types";
+import { OverridableStringUnion, Simplify } from '@mui/types';
+
 /**
  * ====================================================
  * Developer facing types, they can augment these types.
@@ -68,34 +69,27 @@ export interface PaletteVariant {
   solidDisabledColor: string;
   solidDisabledBg: string;
   solidDisabledBorder: string;
-
-  // override palette.text
-  // overrideTextPrimary: string;
-  // overrideTextSecondary: string;
-  // overrideTextTertiary: string;
 }
 
 export interface PaletteRangeOverrides {}
 export type ExtendedPaletteRange = OverridableStringUnion<
-  | "50"
-  | "100"
-  | "200"
-  | "300"
-  | "400"
-  | "500"
-  | "600"
-  | "700"
-  | "800"
-  | "900"
-  | "mainChannel"
-  | "lightChannel"
-  | "darkChannel",
+  | '50'
+  | '100'
+  | '200'
+  | '300'
+  | '400'
+  | '500'
+  | '600'
+  | '700'
+  | '800'
+  | '900'
+  | 'mainChannel'
+  | 'lightChannel'
+  | 'darkChannel',
   PaletteRangeOverrides
 >;
 
-export interface PaletteRange
-  extends Record<ExtendedPaletteRange, string>,
-    PaletteVariant {}
+export interface PaletteRange extends Record<ExtendedPaletteRange, string>, PaletteVariant {}
 
 export interface PaletteCommon {
   white: string;
@@ -110,6 +104,7 @@ export interface PaletteText {
 export interface PaletteBackground {
   body: string;
   surface: string;
+  popup: string;
   level1: string;
   level2: string;
   level3: string;
@@ -119,13 +114,7 @@ export interface PaletteBackground {
 
 export interface ColorPalettePropOverrides {}
 
-export type DefaultColorPalette =
-  | "primary"
-  | "neutral"
-  | "danger"
-  | "info"
-  | "success"
-  | "warning";
+export type DefaultColorPalette = 'primary' | 'neutral' | 'danger' | 'info' | 'success' | 'warning';
 
 export type ColorPaletteProp = OverridableStringUnion<
   DefaultColorPalette,
@@ -142,7 +131,7 @@ export interface PaletteSuccess extends PaletteRange {}
 export interface PaletteWarning extends PaletteRange {}
 
 export interface Palette {
-  mode: "light" | "dark";
+  mode: 'light' | 'dark';
   primary: PalettePrimary;
   neutral: PaletteNeutral;
   danger: PaletteDanger;
@@ -162,10 +151,8 @@ export interface ColorSystem {
   shadowChannel: string;
 }
 
-export type ApplyColorInversion<
-  T extends { color?: ColorPaletteProp | "inherit" }
-> = Simplify<
-  Omit<T, "color"> & {
-    color: T["color"] | "context";
+export type ApplyColorInversion<T extends { color?: ColorPaletteProp | 'inherit' }> = Simplify<
+  Omit<T, 'color'> & {
+    color: T['color'] | 'context';
   }
 >;

@@ -29,12 +29,12 @@
     "preinstall": "npx only-allow yarn"
   },
   "dependencies": {
-    "@mui/base": "^5.0.0-alpha.103",
-    "@mui/system": "^5.10.10",
-    "@mui/types": "^7.2.0",
-    "@mui/utils": "^5.10.9",
+    "@mui/base": "^5.0.0-alpha.112",
+    "@mui/system": "^5.11.2",
+    "@mui/types": "^7.2.3",
+    "@mui/utils": "^5.11.2",
     "clsx": "^1.2.1",
-    "csstype": "^3.1.0"
+    "csstype": "^3.1.1"
   },
   "devDependencies": {
     "@types/node": "^17.0.33",

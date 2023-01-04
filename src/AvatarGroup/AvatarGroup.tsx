@@ -1,71 +1,64 @@
-import * as React from "react";
-import clsx from "clsx";
-import PropTypes from "prop-types";
-import { unstable_composeClasses as composeClasses } from "@mui/base";
-import { OverridableComponent } from "@mui/types";
-import { useThemeProps } from "../styles";
-import styled from "../styles/styled";
-import { getAvatarGroupUtilityClass } from "./avatarGroupClasses";
-import { AvatarGroupProps, AvatarGroupTypeMap } from "./AvatarGroupProps";
+import * as React from 'react';
+import clsx from 'clsx';
+import PropTypes from 'prop-types';
+import { unstable_composeClasses as composeClasses } from '@mui/base';
+import { OverridableComponent } from '@mui/types';
+import { useThemeProps } from '../styles';
+import styled from '../styles/styled';
+import { getAvatarGroupUtilityClass } from './avatarGroupClasses';
+import { AvatarGroupProps, AvatarGroupOwnerState, AvatarGroupTypeMap } from './AvatarGroupProps';
 
-export const AvatarGroupContext = React.createContext<
-  undefined | AvatarGroupProps
->(undefined);
+export const AvatarGroupContext = React.createContext<undefined | AvatarGroupOwnerState>(undefined);
 
 const useUtilityClasses = () => {
   const slots = {
-    root: ["root"],
+    root: ['root'],
   };
 
   return composeClasses(slots, getAvatarGroupUtilityClass, {});
 };
 
-const AvatarGroupGroupRoot = styled("div", {
-  name: "RadAvatarGroup",
-  slot: "Root",
-  overridesResolver: (props, styles) => styles.root,
-})<{ ownerState: AvatarGroupProps }>(({ ownerState, theme }) => ({
-  ...(ownerState.size === "sm" && {
-    "--AvatarGroup-gap": "-0.375rem",
-    "--Avatar-ringSize": "2px",
+const AvatarGroupGroupRoot = styled('div', {
+  name: 'RadAvatarGroup',
+  slot: 'Root',
+  overridesResolver: (_props, styles) => styles.root,
+})<{ ownerState: AvatarGroupOwnerState }>(({ ownerState, theme }) => ({
+  ...(ownerState.size === 'sm' && {
+    '--AvatarGroup-gap': '-0.375rem',
+    '--Avatar-ringSize': '2px',
   }),
-  ...(ownerState.size === "md" && {
-    "--AvatarGroup-gap": "-0.5rem",
-    "--Avatar-ringSize": "2px",
+  ...(ownerState.size === 'md' && {
+    '--AvatarGroup-gap': '-0.5rem',
+    '--Avatar-ringSize': '2px',
   }),
-  ...(ownerState.size === "lg" && {
-    "--AvatarGroup-gap": "-0.625rem",
-    "--Avatar-ringSize": "4px",
+  ...(ownerState.size === 'lg' && {
+    '--AvatarGroup-gap': '-0.625rem',
+    '--Avatar-ringSize': '4px',
   }),
-  "--Avatar-ring": `0 0 0 var(--Avatar-ringSize) var(--Avatar-ringColor, ${theme.vars.palette.background.surface})`,
-  "--Avatar-marginInlineStart": "var(--AvatarGroup-gap)",
-  display: "flex",
-  marginInlineStart: "calc(-1 * var(--AvatarGroup-gap))",
+  '--Avatar-ring': `0 0 0 var(--Avatar-ringSize) var(--Avatar-ringColor, ${theme.vars.palette.background.surface})`,
+  '--Avatar-marginInlineStart': 'var(--AvatarGroup-gap)',
+  display: 'flex',
+  marginInlineStart: 'calc(-1 * var(--AvatarGroup-gap))',
 }));
 
 const AvatarGroup = React.forwardRef(function AvatarGroup(inProps, ref) {
   const props = useThemeProps<typeof inProps & AvatarGroupProps>({
     props: inProps,
-    name: "RadAvatarGroup",
+    name: 'RadAvatarGroup',
   });
 
-  const {
-    className,
-    color,
-    component = "div",
-    size = "md",
-    variant,
-    children,
-    ...other
-  } = props;
+  const { className, color, component = 'div', size = 'md', variant, children, ...other } = props;
 
-  const ownerState = {
-    ...props,
-    color,
-    component,
-    size,
-    variant,
-  };
+  const ownerState = React.useMemo(
+    () => ({
+      ...props,
+      color,
+      component,
+      size,
+      variant,
+    }),
+    [color, component, props, size, variant],
+  );
 
   const classes = useUtilityClasses();
 
@@ -103,14 +96,7 @@ AvatarGroup.propTypes /* remove-proptypes */ = {
    * @default 'neutral'
    */
   color: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf([
-      "danger",
-      "info",
-      "neutral",
-      "primary",
-      "success",
-      "warning",
-    ]),
+    PropTypes.oneOf(['danger', 'info', 'neutral', 'primary', 'success', 'warning']),
     PropTypes.string,
   ]),
   /**
@@ -124,16 +110,14 @@ AvatarGroup.propTypes /* remove-proptypes */ = {
    * @default 'md'
    */
   size: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["lg", "md", "sm"]),
+    PropTypes.oneOf(['lg', 'md', 'sm']),
     PropTypes.string,
   ]),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.
    */
   sx: PropTypes.oneOfType([
-    PropTypes.arrayOf(
-      PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])
-    ),
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
     PropTypes.func,
     PropTypes.object,
   ]),
@@ -142,7 +126,7 @@ AvatarGroup.propTypes /* remove-proptypes */ = {
    * @default 'soft'
    */
   variant: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["outlined", "plain", "soft", "solid"]),
+    PropTypes.oneOf(['outlined', 'plain', 'soft', 'solid']),
     PropTypes.string,
   ]),
 } as any;

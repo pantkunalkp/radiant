@@ -1,4 +1,4 @@
-import { generateUtilityClass, generateUtilityClasses } from "../className";
+import { generateUtilityClass, generateUtilityClasses } from '../className';
 
 export interface BadgeClasses {
   /** Class name applied to the root element. */
@@ -25,6 +25,8 @@ export interface BadgeClasses {
   colorSuccess: string;
   /** Styles applied to the badge `span` element if `color="warning"`. */
   colorWarning: string;
+  /** Styles applied to the root element when color inversion is triggered. */
+  colorContext: string;
   /** State class applied to the badge `span` element if `invisible={true}`. */
   invisible: string;
   /** State class applied to the badge `span` element if `location="inside"`. */
@@ -50,32 +52,33 @@ export interface BadgeClasses {
 export type BadgeClassKey = keyof BadgeClasses;
 
 export function getBadgeUtilityClass(slot: string): string {
-  return generateUtilityClass("RadBadge", slot);
+  return generateUtilityClass('RadBadge', slot);
 }
 
-const badgeClasses: BadgeClasses = generateUtilityClasses("RadBadge", [
-  "root",
-  "badge",
-  "anchorOriginTopRight",
-  "anchorOriginBottomRight",
-  "anchorOriginTopLeft",
-  "anchorOriginBottomLeft",
-  "colorPrimary",
-  "colorDanger",
-  "colorInfo",
-  "colorNeutral",
-  "colorSuccess",
-  "colorWarning",
-  "invisible",
-  "locationInside",
-  "locationOutside",
-  "sizeSm",
-  "sizeMd",
-  "sizeLg",
-  "variantPlain",
-  "variantOutlined",
-  "variantSoft",
-  "variantSolid",
+const badgeClasses: BadgeClasses = generateUtilityClasses('RadBadge', [
+  'root',
+  'badge',
+  'anchorOriginTopRight',
+  'anchorOriginBottomRight',
+  'anchorOriginTopLeft',
+  'anchorOriginBottomLeft',
+  'colorPrimary',
+  'colorDanger',
+  'colorInfo',
+  'colorNeutral',
+  'colorSuccess',
+  'colorWarning',
+  'colorContext',
+  'invisible',
+  'locationInside',
+  'locationOutside',
+  'sizeSm',
+  'sizeMd',
+  'sizeLg',
+  'variantPlain',
+  'variantOutlined',
+  'variantSoft',
+  'variantSolid',
 ]);
 
 export default badgeClasses;

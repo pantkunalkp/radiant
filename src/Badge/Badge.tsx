@@ -1,31 +1,25 @@
-import { unstable_composeClasses as composeClasses } from "@mui/base";
-import BadgeUnstyled from "@mui/base/BadgeUnstyled";
-import { OverridableComponent } from "@mui/types";
-import {
-  unstable_capitalize as capitalize,
-  usePreviousProps,
-} from "@mui/utils";
-import clsx from "clsx";
-import PropTypes from "prop-types";
-import * as React from "react";
-import styled from "../styles/styled";
-import useThemeProps from "../styles/useThemeProps";
-import shouldSpreadAdditionalProps from "../utils/shouldSpreadAdditionalProps";
-import badgeClasses, { getBadgeUtilityClass } from "./badgeClasses";
-import { BadgeProps, BadgeTypeMap } from "./BadgeProps";
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import { OverridableComponent } from '@mui/types';
+import { unstable_capitalize as capitalize, usePreviousProps } from '@mui/utils';
+import { unstable_composeClasses as composeClasses } from '@mui/base';
+import styled from '../styles/styled';
+import useThemeProps from '../styles/useThemeProps';
+import { useColorInversion } from '../styles/ColorInversion';
+import useSlot from '../utils/useSlot';
+import badgeClasses, { getBadgeUtilityClass } from './badgeClasses';
+import { BadgeProps, BadgeOwnerState, BadgeTypeMap } from './BadgeProps';
 
-const useUtilityClasses = (ownerState: BadgeProps) => {
+const useUtilityClasses = (ownerState: BadgeOwnerState) => {
   const { color, variant, size, anchorOrigin, invisible } = ownerState;
 
   const slots = {
-    root: ["root"],
+    root: ['root'],
     badge: [
-      "badge",
-      invisible && "invisible",
+      'badge',
+      invisible && 'invisible',
       anchorOrigin &&
-        `anchorOrigin${capitalize(anchorOrigin.vertical)}${capitalize(
-          anchorOrigin.horizontal
-        )}`,
+        `anchorOrigin${capitalize(anchorOrigin.vertical)}${capitalize(anchorOrigin.horizontal)}`,
       variant && `variant${capitalize(variant)}`,
       color && `color${capitalize(color)}`,
       size && `size${capitalize(size)}`,
@@ -76,7 +70,7 @@ const BadgeRoot = styled("span", {
 const BadgeBadge = styled("span", {
   name: "RadBadge",
   slot: "Badge",
-  overridesResolver: (props, styles) => styles.badge,
+  overridesResolver: (_props, styles) => styles.badge,
 })<{ ownerState: BadgeProps }>(({ theme, ownerState }) => {
   const inset = {
     top: ownerState.badgeInset,
@@ -162,19 +156,20 @@ const Badge = React.forwardRef(function Badge(inProps, ref) {
       vertical: "top",
       horizontal: "right",
     },
+    //@ts-ignore
     badgeInset: badgeInsetProp = 0,
     className,
     component = "span",
-    //@ts-ignore
-    components = {}, //@ts-ignore
-    componentsProps = {},
-    size: sizeProp = "md",
-    color: colorProp = "primary",
+        //@ts-ignore
+    badgeInset: badgeInsetProp = 0,
+    children,
+    size: sizeProp = 'md',
+    color: colorProp = 'primary',
     invisible: invisibleProp = false,
-    max,
-    badgeContent: badgeContentProp = "",
+    max = 99,
+    badgeContent: badgeContentProp = '',
     showZero = false,
-    variant: variantProp = "solid",
+    variant: variantProp = 'solid',
     ...other
   } = props;
 
@@ -184,7 +179,7 @@ const Badge = React.forwardRef(function Badge(inProps, ref) {
     badgeInset: badgeInsetProp,
     color: colorProp,
     variant: variantProp,
-  });
+  }) as BadgeProps;
 
   let invisible = invisibleProp;
 
@@ -196,78 +191,47 @@ const Badge = React.forwardRef(function Badge(inProps, ref) {
   }
 
   const {
-    color = colorProp,
+    color: internalColor = colorProp,
     size = sizeProp,
     anchorOrigin = anchorOriginProp,
     variant = variantProp,
     badgeInset = badgeInsetProp,
-  }: {
-    size?: BadgeProps["size"];
-    color?: BadgeProps["color"];
-    anchorOrigin?: BadgeProps["anchorOrigin"];
-    variant?: BadgeProps["variant"];
-    badgeInset?: BadgeProps["badgeInset"];
   } = invisible ? prevProps : props;
 
-  const ownerState = {
-    ...props,
-    anchorOrigin,
-    badgeInset,
-    variant,
-    invisible,
-    color,
-    size,
-  };
+  const { getColor } = useColorInversion(variant);
+  const color = getColor(inProps.color, internalColor);
+
+  const ownerState = { ...props, anchorOrigin, badgeInset, variant, invisible, color, size };
+
   const classes = useUtilityClasses(ownerState);
-  const displayValue =
+  let displayValue =
     max !== undefined && badgeContentProp && Number(badgeContentProp) > max
       ? `${max}+`
       : badgeContentProp;
+      if (invisible && badgeContentProp === 0) {
+        displayValue = '';
+      }
+
+      const [SlotRoot, rootProps] = useSlot('root', {
+        ref,
+        className: classes.root,
+        elementType: BadgeRoot,
+        externalForwardedProps: other,
+        ownerState,
+      });
+    
+      const [SlotBadge, badgeProps] = useSlot('badge', {
+        className: classes.badge,
+        elementType: BadgeBadge,
+        externalForwardedProps: other,
+        ownerState,
+      });
 
   return (
-    //@ts-ignore
-    <BadgeUnstyled
-      ref={ref}
-      invisible={invisibleProp}
-      badgeContent={displayValue}
-      showZero={showZero}
-      max={max}
-      {...other}
-      components={{
-        Root: BadgeRoot,
-        Badge: BadgeBadge,
-        ...components,
-      }}
-      className={clsx(className, classes.root)}
-      componentsProps={{
-        root: {
-          ...componentsProps.root,
-          ...(shouldSpreadAdditionalProps(components.Root) && {
-            as: component,
-            ownerState: {
-              anchorOrigin,
-              color,
-              variant,
-              badgeInset,
-              size,
-            },
-          }),
-        },
-        badge: {
-          ...componentsProps.badge,
-          className: clsx(classes.badge),
-          ...(shouldSpreadAdditionalProps(components.Badge) && {
-            ownerState: {
-              anchorOrigin,
-              color,
-              variant,
-              badgeInset,
-              size,
-            },
-          }),
-        },
-      }}
-    />
+    <SlotRoot {...rootProps}>
+    {children}
+    <SlotBadge {...badgeProps}>{displayValue}</SlotBadge>
+  </SlotRoot>
   );
 }) as OverridableComponent<BadgeTypeMap>;
 
@@ -284,8 +248,8 @@ Badge.propTypes /* remove-proptypes */ = {
    * }
    */
   anchorOrigin: PropTypes.shape({
-    horizontal: PropTypes.oneOf(["left", "right"]).isRequired,
-    vertical: PropTypes.oneOf(["bottom", "top"]).isRequired,
+    horizontal: PropTypes.oneOf(['left', 'right']).isRequired,
+    vertical: PropTypes.oneOf(['bottom', 'top']).isRequired,
   }),
   /**
    * The content rendered within the badge.
@@ -301,46 +265,13 @@ Badge.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
-   * @ignore
-   */
-  className: PropTypes.string,
-  /**
    * The color of the component. It supports those theme colors that make sense for this component.
    * @default 'primary'
    */
   color: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf([
-      "danger",
-      "info",
-      "neutral",
-      "primary",
-      "success",
-      "warning",
-    ]),
+    PropTypes.oneOf(['danger', 'info', 'neutral', 'primary', 'success', 'warning']),
     PropTypes.string,
   ]),
-  /**
-   * The component used for the root node.
-   * Either a string to use a HTML element or a component.
-   */
-  component: PropTypes.elementType,
-  /**
-   * The components used for each slot inside the Badge.
-   * Either a string to use a HTML element or a component.
-   * @default {}
-   */
-  components: PropTypes.shape({
-    Badge: PropTypes.elementType,
-    Root: PropTypes.elementType,
-  }),
-  /**
-   * The props used for each slot inside the Badge.
-   * @default {}
-   */
-  componentsProps: PropTypes.shape({
-    badge: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    root: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-  }),
   /**
    * If `true`, the badge is invisible.
    * @default false
@@ -361,16 +292,14 @@ Badge.propTypes /* remove-proptypes */ = {
    * @default 'md'
    */
   size: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["sm", "md", "lg"]),
+    PropTypes.oneOf(['sm', 'md', 'lg']),
     PropTypes.string,
   ]),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.
    */
   sx: PropTypes.oneOfType([
-    PropTypes.arrayOf(
-      PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])
-    ),
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
     PropTypes.func,
     PropTypes.object,
   ]),
@@ -379,7 +308,7 @@ Badge.propTypes /* remove-proptypes */ = {
    * @default 'solid'
    */
   variant: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["outlined", "plain", "soft", "solid"]),
+    PropTypes.oneOf(['outlined', 'plain', 'soft', 'solid']),
     PropTypes.string,
   ]),
 } as any;

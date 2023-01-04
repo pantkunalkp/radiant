@@ -1,4 +1,4 @@
-import { generateUtilityClass, generateUtilityClasses } from "../className";
+import { generateUtilityClass, generateUtilityClasses } from '../className';
 
 export interface AvatarClasses {
   /** Styles applied to the root element. */
@@ -15,6 +15,8 @@ export interface AvatarClasses {
   colorSuccess: string;
   /** Styles applied to the root element if `color="warning"`. */
   colorWarning: string;
+  /** Styles applied to the root element when color inversion is triggered. */
+  colorContext: string;
   /** Styles applied to the fallback icon. */
   fallback: string;
   /** Styles applied to the root element if `size="sm"`. */
@@ -36,25 +38,26 @@ export interface AvatarClasses {
 export type AvatarClassKey = keyof AvatarClasses;
 
 export function getAvatarUtilityClass(slot: string): string {
-  return generateUtilityClass("RadAvatar", slot);
+  return generateUtilityClass('RadAvatar', slot);
 }
 
-const avatarClasses: AvatarClasses = generateUtilityClasses("RadAvatar", [
-  "root",
-  "colorPrimary",
-  "colorNeutral",
-  "colorDanger",
-  "colorInfo",
-  "colorSuccess",
-  "colorWarning",
-  "fallback",
-  "sizeSm",
-  "sizeMd",
-  "sizeLg",
-  "img",
-  "variantOutlined",
-  "variantSoft",
-  "variantSolid",
+const avatarClasses: AvatarClasses = generateUtilityClasses('RadAvatar', [
+  'root',
+  'colorPrimary',
+  'colorNeutral',
+  'colorDanger',
+  'colorInfo',
+  'colorSuccess',
+  'colorWarning',
+  'colorContext',
+  'fallback',
+  'sizeSm',
+  'sizeMd',
+  'sizeLg',
+  'img',
+  'variantOutlined',
+  'variantSoft',
+  'variantSolid',
 ]);
 
 export default avatarClasses;

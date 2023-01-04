@@ -1,16 +1,18 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import clsx from "clsx";
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import clsx from 'clsx';
 import {
   unstable_composeClasses as composeClasses,
   unstable_capitalize as capitalize,
-} from "@mui/utils";
-import { OverridableComponent } from "@mui/types";
-import { useSlider } from "@mui/base/SliderUnstyled";
-import { useSlotProps } from "@mui/base/utils";
-import { useThemeProps, styled, Theme } from "../styles";
-import sliderClasses, { getSliderUtilityClass } from "./sliderClasses";
-import { SliderProps, SliderTypeMap, SliderOwnerState } from "./SliderProps";
+} from '@mui/utils';
+import { OverridableComponent } from '@mui/types';
+import { useSlider } from '@mui/base/SliderUnstyled';
+import { isHostComponent } from '@mui/base/utils';
+import { useThemeProps, styled, Theme } from '../styles';
+import { useColorInversion } from '../styles/ColorInversion';
+import useSlot from '../utils/useSlot';
+import sliderClasses, { getSliderUtilityClass } from './sliderClasses';
+import { SliderTypeMap, SliderOwnerState } from './SliderProps';
 
 const valueToPercent = (value: number, min: number, max: number) =>
   ((value - min) * 100) / (max - min);
@@ -18,271 +20,266 @@ const valueToPercent = (value: number, min: number, max: number) =>
 const Identity = (x: any) => x;
 
 const useUtilityClasses = (ownerState: SliderOwnerState) => {
-  const { disabled, dragging, marked, orientation, track, color, size } =
-    ownerState;
+  const { disabled, dragging, marked, orientation, track, variant, color, size } = ownerState;
 
   const slots = {
     root: [
-      "root",
-      disabled && "disabled",
-      dragging && "dragging",
-      marked && "marked",
-      orientation === "vertical" && "vertical",
-      track === "inverted" && "trackInverted",
-      track === false && "trackFalse",
+      'root',
+      disabled && 'disabled',
+      dragging && 'dragging',
+      marked && 'marked',
+      orientation === 'vertical' && 'vertical',
+      track === 'inverted' && 'trackInverted',
+      track === false && 'trackFalse',
+      variant && `variant${capitalize(variant)}`,
       color && `color${capitalize(color)}`,
       size && `size${capitalize(size)}`,
     ],
-    rail: ["rail"],
-    track: ["track"],
-    mark: ["mark"],
-    markActive: ["markActive"],
-    markLabel: ["markLabel"],
-    markLabelActive: ["markLabelActive"],
-    valueLabel: ["valueLabel"],
-    valueLabelOpen: ["valueLabelOpen"],
-    thumb: ["thumb", disabled && "disabled"],
-    active: ["active"],
-    focusVisible: ["focusVisible"],
+    rail: ['rail'],
+    track: ['track'],
+    thumb: ['thumb', disabled && 'disabled'],
+    input: ['input'],
+    mark: ['mark'],
+    markActive: ['markActive'],
+    markLabel: ['markLabel'],
+    markLabelActive: ['markLabelActive'],
+    valueLabel: ['valueLabel'],
+    valueLabelOpen: ['valueLabelOpen'],
+    active: ['active'],
+    focusVisible: ['focusVisible'],
   };
 
   return composeClasses(slots, getSliderUtilityClass, {});
 };
 
 const sliderColorVariables =
-  ({ theme, ownerState }: { theme: Theme; ownerState: SliderProps }) =>
-  (data: { state?: "Hover" | "Disabled" | "Active" } = {}) => {
+  ({ theme, ownerState }: { theme: Theme; ownerState: SliderOwnerState }) =>
+  (data: { state?: 'Hover' | 'Disabled' | 'Active' } = {}) => {
     const styles =
-      theme.variants[`${ownerState.variant!}${data.state || ""}`]?.[
-        ownerState.color!
-      ] || {};
+      theme.variants[`${ownerState.variant!}${data.state || ''}`]?.[ownerState.color!] || {};
     return {
       ...(styles.border && {
-        "--variant-borderWidth": styles["--variant-borderWidth"],
+        '--variant-borderWidth': styles['--variant-borderWidth'],
       }),
-      "--Slider-track-color": styles.color,
-      "--Slider-thumb-background": styles.color,
-      "--Slider-thumb-color":
-        styles.backgroundColor || theme.vars.palette.background.surface,
-      "--Slider-track-background":
-        styles.backgroundColor || theme.vars.palette.background.surface,
-      "--Slider-track-borderColor": styles.borderColor,
-      "--Slider-rail-background": theme.vars.palette.background.level2,
+      '--Slider-track-color': styles.color,
+      '--Slider-thumb-background': styles.color,
+      '--Slider-thumb-color': styles.backgroundColor || theme.vars.palette.background.surface,
+      '--Slider-track-background': styles.backgroundColor || theme.vars.palette.background.surface,
+      '--Slider-track-borderColor': styles.borderColor,
+      '--Slider-rail-background': theme.vars.palette.background.level2,
     };
   };
 
-const SliderRoot = styled("span", {
-  name: "RadSlider",
-  slot: "Root",
+const SliderRoot = styled('span', {
+  name: 'RadSlider',
+  slot: 'Root',
   overridesResolver: (_props, styles) => styles.root,
 })<{ ownerState: SliderOwnerState }>(({ theme, ownerState }) => {
   const getColorVariables = sliderColorVariables({ theme, ownerState });
   return [
     {
-      "--variant-borderWidth": "0px", // prevent using --variant-borderWidth from the outer scope
-      "--Slider-size":
-        "max(42px, max(var(--Slider-thumb-size), var(--Slider-track-size)))", // Reach 42px touch target, about ~8mm on screen.
-      "--Slider-track-radius": "var(--Slider-size)",
-      "--Slider-mark-background": theme.vars.palette.text.tertiary,
+      '--variant-borderWidth': '0px', // prevent using --variant-borderWidth from the outer scope
+      '--Slider-size': 'max(42px, max(var(--Slider-thumb-size), var(--Slider-track-size)))', // Reach 42px touch target, about ~8mm on screen.
+      '--Slider-track-radius': 'var(--Slider-size)',
+      '--Slider-mark-background': theme.vars.palette.text.tertiary,
       [`& .${sliderClasses.markActive}`]: {
-        "--Slider-mark-background": "var(--Slider-track-color)",
+        '--Slider-mark-background': 'var(--Slider-track-color)',
       },
-      ...(ownerState.size === "sm" && {
-        "--Slider-mark-size": "2px",
-        "--Slider-track-size": "4px",
-        "--Slider-thumb-size": "10px",
-        "--Slider-valueLabel-arrowSize": "6px",
+      ...(ownerState.size === 'sm' && {
+        '--Slider-mark-size': '2px',
+        '--Slider-track-size': '4px',
+        '--Slider-thumb-size': '10px',
+        '--Slider-valueLabel-arrowSize': '6px',
       }),
-      ...(ownerState.size === "md" && {
-        "--Slider-mark-size": "2px",
-        "--Slider-track-size": "6px",
-        "--Slider-thumb-size": "14px",
-        "--Slider-valueLabel-arrowSize": "8px",
+      ...(ownerState.size === 'md' && {
+        '--Slider-mark-size': '2px',
+        '--Slider-track-size': '6px',
+        '--Slider-thumb-size': '14px',
+        '--Slider-valueLabel-arrowSize': '8px',
       }),
-      ...(ownerState.size === "lg" && {
-        "--Slider-mark-size": "3px",
-        "--Slider-track-size": "10px",
-        "--Slider-thumb-size": "20px",
-        "--Slider-valueLabel-arrowSize": "10px",
+      ...(ownerState.size === 'lg' && {
+        '--Slider-mark-size': '3px',
+        '--Slider-track-size': '10px',
+        '--Slider-thumb-size': '20px',
+        '--Slider-valueLabel-arrowSize': '10px',
       }),
-      "--Slider-thumb-radius": "calc(var(--Slider-thumb-size) / 2)",
-      "--Slider-thumb-width": "var(--Slider-thumb-size)",
+      '--Slider-thumb-radius': 'calc(var(--Slider-thumb-size) / 2)',
+      '--Slider-thumb-width': 'var(--Slider-thumb-size)',
       ...getColorVariables(),
-      "&:hover": {
-        ...getColorVariables({ state: "Hover" }),
+      '&:hover': {
+        ...getColorVariables({ state: 'Hover' }),
       },
-      "&:active": {
-        ...getColorVariables({ state: "Active" }),
+      '&:active': {
+        ...getColorVariables({ state: 'Active' }),
       },
       [`&.${sliderClasses.disabled}`]: {
-        pointerEvents: "none",
+        pointerEvents: 'none',
         color: theme.vars.palette.text.tertiary,
-        ...getColorVariables({ state: "Disabled" }),
+        ...getColorVariables({ state: 'Disabled' }),
       },
       [`&.${sliderClasses.dragging}`]: {
         [`& .${sliderClasses.track}, & .${sliderClasses.thumb}`]: {
-          transition: "none",
+          transition: 'none',
         },
       },
-      boxSizing: "border-box",
-      display: "inline-block",
-      position: "relative",
-      cursor: "pointer",
-      touchAction: "none",
-      WebkitTapHighlightColor: "transparent",
-      ...(ownerState.orientation === "horizontal" && {
-        padding: "calc(var(--Slider-size) / 2) 0",
-        width: "100%",
+      boxSizing: 'border-box',
+      display: 'inline-block',
+      position: 'relative',
+      cursor: 'pointer',
+      touchAction: 'none',
+      WebkitTapHighlightColor: 'transparent',
+      ...(ownerState.orientation === 'horizontal' && {
+        padding: 'calc(var(--Slider-size) / 2) 0',
+        width: '100%',
       }),
-      ...(ownerState.orientation === "vertical" && {
-        padding: "0 calc(var(--Slider-size) / 2)",
-        height: "100%",
+      ...(ownerState.orientation === 'vertical' && {
+        padding: '0 calc(var(--Slider-size) / 2)',
+        height: '100%',
       }),
-      "@media print": {
-        colorAdjust: "exact",
+      '@media print': {
+        colorAdjust: 'exact',
       },
     },
   ];
 });
 
-const SliderRail = styled("span", {
-  name: "RadSlider",
-  slot: "Rail",
+const SliderRail = styled('span', {
+  name: 'RadSlider',
+  slot: 'Rail',
   overridesResolver: (_props, styles) => styles.rail,
 })<{ ownerState: SliderOwnerState }>(({ ownerState }) => [
   {
-    display: "block",
-    position: "absolute",
+    display: 'block',
+    position: 'absolute',
     backgroundColor:
-      ownerState.track === "inverted"
-        ? "var(--Slider-track-background)"
-        : "var(--Slider-rail-background)",
+      ownerState.track === 'inverted'
+        ? 'var(--Slider-track-background)'
+        : 'var(--Slider-rail-background)',
     border:
-      ownerState.track === "inverted"
-        ? "var(--variant-borderWidth) solid var(--Slider-track-borderColor)"
-        : "initial",
-    borderRadius: "var(--Slider-track-radius)",
-    ...(ownerState.orientation === "horizontal" && {
-      height: "var(--Slider-track-size)",
-      top: "50%",
+      ownerState.track === 'inverted'
+        ? 'var(--variant-borderWidth, 0px) solid var(--Slider-track-borderColor)'
+        : 'initial',
+    borderRadius: 'var(--Slider-track-radius)',
+    ...(ownerState.orientation === 'horizontal' && {
+      height: 'var(--Slider-track-size)',
+      top: '50%',
       left: 0,
       right: 0,
-      transform: "translateY(-50%)",
+      transform: 'translateY(-50%)',
     }),
-    ...(ownerState.orientation === "vertical" && {
-      width: "var(--Slider-track-size)",
+    ...(ownerState.orientation === 'vertical' && {
+      width: 'var(--Slider-track-size)',
       top: 0,
       bottom: 0,
-      left: "50%",
-      transform: "translateX(-50%)",
+      left: '50%',
+      transform: 'translateX(-50%)',
     }),
-    ...(ownerState.track === "inverted" && {
+    ...(ownerState.track === 'inverted' && {
       opacity: 1,
     }),
   },
 ]);
 
-const SliderTrack = styled("span", {
-  name: "RadSlider",
-  slot: "Track",
+const SliderTrack = styled('span', {
+  name: 'RadSlider',
+  slot: 'Track',
   overridesResolver: (_props, styles) => styles.track,
 })<{ ownerState: SliderOwnerState }>(({ ownerState }) => {
   return [
     {
-      display: "block",
-      position: "absolute",
-      color: "var(--Slider-track-color)",
+      display: 'block',
+      position: 'absolute',
+      color: 'var(--Slider-track-color)',
       border:
-        ownerState.track === "inverted"
-          ? "initial"
-          : "var(--variant-borderWidth) solid var(--Slider-track-borderColor)",
+        ownerState.track === 'inverted'
+          ? 'initial'
+          : 'var(--variant-borderWidth, 0px) solid var(--Slider-track-borderColor)',
       backgroundColor:
-        ownerState.track === "inverted"
-          ? "var(--Slider-rail-background)"
-          : "var(--Slider-track-background)",
+        ownerState.track === 'inverted'
+          ? 'var(--Slider-rail-background)'
+          : 'var(--Slider-track-background)',
       // TODO: discuss the transition approach in a separate PR. This value is copied from mui-material Slider.
       transition:
-        "left 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, width 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, bottom 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, height 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
-      ...(ownerState.orientation === "horizontal" && {
-        height: "var(--Slider-track-size)",
-        top: "50%",
-        transform: "translateY(-50%)",
-        borderRadius:
-          "var(--Slider-track-radius) 0 0 var(--Slider-track-radius)",
+        'left 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, width 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, bottom 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, height 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+      ...(ownerState.orientation === 'horizontal' && {
+        height: 'var(--Slider-track-size)',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        borderRadius: 'var(--Slider-track-radius) 0 0 var(--Slider-track-radius)',
       }),
-      ...(ownerState.orientation === "vertical" && {
-        width: "var(--Slider-track-size)",
-        left: "50%",
-        transform: "translateX(-50%)",
-        borderRadius:
-          "0 0 var(--Slider-track-radius) var(--Slider-track-radius)",
+      ...(ownerState.orientation === 'vertical' && {
+        width: 'var(--Slider-track-size)',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        borderRadius: '0 0 var(--Slider-track-radius) var(--Slider-track-radius)',
       }),
       ...(ownerState.track === false && {
-        display: "none",
+        display: 'none',
       }),
     },
   ];
 });
 
-const SliderThumb = styled("span", {
-  name: "RadSlider",
-  slot: "Thumb",
+const SliderThumb = styled('span', {
+  name: 'RadSlider',
+  slot: 'Thumb',
   overridesResolver: (_props, styles) => styles.thumb,
 })<{ ownerState: SliderOwnerState }>(({ ownerState, theme }) => ({
-  position: "absolute",
-  boxSizing: "border-box",
+  position: 'absolute',
+  boxSizing: 'border-box',
   outline: 0,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "var(--Slider-thumb-width)",
-  height: "var(--Slider-thumb-size)",
-  border: "var(--variant-borderWidth) solid var(--Slider-track-borderColor)",
-  borderRadius: "var(--Slider-thumb-radius)",
-  boxShadow: "var(--Slider-thumb-shadow)",
-  color: "var(--Slider-thumb-color)",
-  backgroundColor: "var(--Slider-thumb-background)",
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 'var(--Slider-thumb-width)',
+  height: 'var(--Slider-thumb-size)',
+  border: 'var(--variant-borderWidth, 0px) solid var(--Slider-track-borderColor)',
+  borderRadius: 'var(--Slider-thumb-radius)',
+  boxShadow: 'var(--Slider-thumb-shadow)',
+  color: 'var(--Slider-thumb-color)',
+  backgroundColor: 'var(--Slider-thumb-background)',
   // TODO: discuss the transition approach in a separate PR. This value is copied from mui-material Slider.
   transition:
-    "left 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,bottom 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+    'left 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,bottom 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
   [theme.focus.selector]: theme.focus.default,
-  ...(ownerState.orientation === "horizontal" && {
-    top: "50%",
-    transform: "translate(-50%, -50%)",
+  ...(ownerState.orientation === 'horizontal' && {
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
   }),
-  ...(ownerState.orientation === "vertical" && {
-    left: "50%",
-    transform: "translate(-50%, 50%)",
+  ...(ownerState.orientation === 'vertical' && {
+    left: '50%',
+    transform: 'translate(-50%, 50%)',
   }),
-  "&::before": {
+  '&::before': {
     // use pseudo element to create thumb's ring
+    boxSizing: 'border-box',
     content: '""',
-    display: "block",
-    position: "absolute",
-    background: "transparent", // to not block the thumb's child
+    display: 'block',
+    position: 'absolute',
+    background: 'transparent', // to not block the thumb's child
     top: 0,
     left: 0,
-    width: "100%",
-    height: "100%",
-    border: "2px solid",
-    borderColor: "var(--Slider-thumb-color)",
-    borderRadius: "inherit",
+    width: '100%',
+    height: '100%',
+    border: '2px solid',
+    borderColor: 'var(--Slider-thumb-color)',
+    borderRadius: 'inherit',
   },
 }));
 
-const SliderMark = styled("span", {
-  name: "RadSlider",
-  slot: "Mark",
+const SliderMark = styled('span', {
+  name: 'RadSlider',
+  slot: 'Mark',
   overridesResolver: (_props, styles) => styles.mark,
-})<{ ownerState: SliderOwnerState & { percent: number } }>(({ ownerState }) => {
+})<{ ownerState: SliderOwnerState & { percent?: number } }>(({ ownerState }) => {
   return {
-    position: "absolute",
-    width: "var(--Slider-mark-size)",
-    height: "var(--Slider-mark-size)",
-    borderRadius: "var(--Slider-mark-size)",
-    backgroundColor: "var(--Slider-mark-background)",
-    ...(ownerState.orientation === "horizontal" && {
-      top: "50%",
+    position: 'absolute',
+    width: 'var(--Slider-mark-size)',
+    height: 'var(--Slider-mark-size)',
+    borderRadius: 'var(--Slider-mark-size)',
+    backgroundColor: 'var(--Slider-mark-background)',
+    ...(ownerState.orientation === 'horizontal' && {
+      top: '50%',
       transform: `translate(calc(var(--Slider-mark-size) / -2), -50%)`,
       ...(ownerState.percent === 0 && {
         transform: `translate(min(var(--Slider-mark-size), 3px), -50%)`,
@@ -291,9 +288,9 @@ const SliderMark = styled("span", {
         transform: `translate(calc(var(--Slider-mark-size) * -1 - min(var(--Slider-mark-size), 3px)), -50%)`,
       }),
     }),
-    ...(ownerState.orientation === "vertical" && {
-      left: "50%",
-      transform: "translate(-50%, calc(var(--Slider-mark-size) / 2))",
+    ...(ownerState.orientation === 'vertical' && {
+      left: '50%',
+      transform: 'translate(-50%, calc(var(--Slider-mark-size) / 2))',
       ...(ownerState.percent === 0 && {
         transform: `translate(-50%, calc(min(var(--Slider-mark-size), 3px) * -1))`,
       }),
@@ -304,113 +301,110 @@ const SliderMark = styled("span", {
   };
 });
 
-const SliderValueLabel = styled("span", {
-  name: "RadSlider",
-  slot: "ValueLabel",
+const SliderValueLabel = styled('span', {
+  name: 'RadSlider',
+  slot: 'ValueLabel',
   overridesResolver: (_props, styles) => styles.valueLabel,
 })<{ ownerState: SliderOwnerState }>(({ theme, ownerState }) => ({
-  ...(ownerState.size === "sm" && {
+  ...(ownerState.size === 'sm' && {
     fontSize: theme.fontSize.xs,
     lineHeight: theme.lineHeight.md,
-    paddingInline: "0.25rem",
-    minWidth: "20px",
+    paddingInline: '0.25rem',
+    minWidth: '20px',
   }),
-  ...(ownerState.size === "md" && {
+  ...(ownerState.size === 'md' && {
     fontSize: theme.fontSize.sm,
     lineHeight: theme.lineHeight.md,
-    paddingInline: "0.375rem",
-    minWidth: "24px",
+    paddingInline: '0.375rem',
+    minWidth: '24px',
   }),
-  ...(ownerState.size === "lg" && {
+  ...(ownerState.size === 'lg' && {
     fontSize: theme.fontSize.md,
     lineHeight: theme.lineHeight.md,
-    paddingInline: "0.5rem",
-    minWidth: "28px",
+    paddingInline: '0.5rem',
+    minWidth: '28px',
   }),
   zIndex: 1,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  whiteSpace: "nowrap",
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  whiteSpace: 'nowrap',
   fontFamily: theme.vars.fontFamily.body,
   fontWeight: theme.vars.fontWeight.md,
   bottom: 0,
-  transformOrigin: "bottom center",
+  transformOrigin: 'bottom center',
   transform:
-    "translateY(calc((var(--Slider-thumb-size) + var(--Slider-valueLabel-arrowSize)) * -1)) scale(0)",
-  position: "absolute",
+    'translateY(calc((var(--Slider-thumb-size) + var(--Slider-valueLabel-arrowSize)) * -1)) scale(0)',
+  position: 'absolute',
   backgroundColor: theme.vars.palette.background.tooltip,
-  boxShadow: theme.vars.shadow.sm,
+  boxShadow: theme.shadow.sm,
   borderRadius: theme.vars.radius.xs,
-  color: "#fff",
-  "&::before": {
-    display: "var(--Slider-valueLabel-arrowDisplay)",
-    position: "absolute",
+  color: '#fff',
+  '&::before': {
+    display: 'var(--Slider-valueLabel-arrowDisplay)',
+    position: 'absolute',
     content: '""',
     color: theme.vars.palette.background.tooltip,
     bottom: 0,
-    border: "calc(var(--Slider-valueLabel-arrowSize) / 2) solid",
-    borderColor: "currentColor",
-    borderRightColor: "transparent",
-    borderBottomColor: "transparent",
-    borderLeftColor: "transparent",
-    left: "50%",
-    transform: "translate(-50%, 100%)",
-    backgroundColor: "transparent",
+    border: 'calc(var(--Slider-valueLabel-arrowSize) / 2) solid',
+    borderColor: 'currentColor',
+    borderRightColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderLeftColor: 'transparent',
+    left: '50%',
+    transform: 'translate(-50%, 100%)',
+    backgroundColor: 'transparent',
   },
   [`&.${sliderClasses.valueLabelOpen}`]: {
     transform:
-      "translateY(calc((var(--Slider-thumb-size) + var(--Slider-valueLabel-arrowSize)) * -1)) scale(1)",
+      'translateY(calc((var(--Slider-thumb-size) + var(--Slider-valueLabel-arrowSize)) * -1)) scale(1)',
   },
 }));
 
-const SliderMarkLabel = styled("span", {
-  name: "RadSlider",
-  slot: "MarkLabel",
+const SliderMarkLabel = styled('span', {
+  name: 'RadSlider',
+  slot: 'MarkLabel',
   overridesResolver: (_props, styles) => styles.markLabel,
 })<{ ownerState: SliderOwnerState }>(({ theme, ownerState }) => ({
   fontFamily: theme.vars.fontFamily.body,
-  ...(ownerState.size === "sm" && {
+  ...(ownerState.size === 'sm' && {
     fontSize: theme.vars.fontSize.xs,
   }),
-  ...(ownerState.size === "md" && {
+  ...(ownerState.size === 'md' && {
     fontSize: theme.vars.fontSize.sm,
   }),
-  ...(ownerState.size === "lg" && {
+  ...(ownerState.size === 'lg' && {
     fontSize: theme.vars.fontSize.md,
   }),
   color: theme.palette.text.tertiary,
-  position: "absolute",
-  whiteSpace: "nowrap",
-  ...(ownerState.orientation === "horizontal" && {
-    top: "calc(50% + 4px + (max(var(--Slider-track-size), var(--Slider-thumb-size)) / 2))",
-    transform: "translateX(-50%)",
+  position: 'absolute',
+  whiteSpace: 'nowrap',
+  ...(ownerState.orientation === 'horizontal' && {
+    top: 'calc(50% + 4px + (max(var(--Slider-track-size), var(--Slider-thumb-size)) / 2))',
+    transform: 'translateX(-50%)',
   }),
-  ...(ownerState.orientation === "vertical" && {
-    left: "calc(50% + 8px + (max(var(--Slider-track-size), var(--Slider-thumb-size)) / 2))",
-    transform: "translateY(50%)",
+  ...(ownerState.orientation === 'vertical' && {
+    left: 'calc(50% + 8px + (max(var(--Slider-track-size), var(--Slider-thumb-size)) / 2))',
+    transform: 'translateY(50%)',
   }),
 }));
 
-const SliderInput = styled("input", {
-  name: "RadSlider",
-  slot: "Input",
+const SliderInput = styled('input', {
+  name: 'RadSlider',
+  slot: 'Input',
   overridesResolver: (_props, styles) => styles.input,
 })<{ ownerState?: SliderOwnerState }>({});
 
 const Slider = React.forwardRef(function Slider(inProps, ref) {
-  const props = useThemeProps<
-    typeof inProps & { component?: React.ElementType }
-  >({
+  const props = useThemeProps<typeof inProps & { component?: React.ElementType }>({
     props: inProps,
-    name: "RadSlider",
+    name: 'RadSlider',
   });
 
   const {
-    "aria-label": ariaLabel,
-    "aria-valuetext": ariaValuetext,
-    component,
-    componentsProps = {},
+    'aria-label': ariaLabel,
+    'aria-valuetext': ariaValuetext,
+    className,
     classes: classesProp,
     disableSwap = false,
     disabled = false,
@@ -424,20 +418,22 @@ const Slider = React.forwardRef(function Slider(inProps, ref) {
     onChange,
     onChangeCommitted,
     onMouseDown,
-    orientation = "horizontal",
+    orientation = 'horizontal',
     scale = Identity,
     step = 1,
     tabIndex,
-    track = "normal",
+    track = 'normal',
     value: valueProp,
-    valueLabelDisplay = "off",
+    valueLabelDisplay = 'off',
     valueLabelFormat = Identity,
     isRtl = false,
-    color = "primary",
-    size = "md",
-    variant = "solid",
+    color: colorProp = 'primary',
+    size = 'md',
+    variant = 'solid',
     ...other
   } = props;
+  const { getColor } = useColorInversion('solid');
+  const color = getColor(inProps.color, colorProp);
 
   const ownerState = {
     ...props,
@@ -486,77 +482,76 @@ const Slider = React.forwardRef(function Slider(inProps, ref) {
 
   const classes = useUtilityClasses(ownerState);
 
-  const rootProps = useSlotProps({
+  const [SlotRoot, rootProps] = useSlot('root', {
+    ref,
+    className: clsx(classes.root, className),
     elementType: SliderRoot,
-    getSlotProps: getRootProps,
-    externalSlotProps: componentsProps.root,
     externalForwardedProps: other,
-    additionalProps: {
-      as: component,
-    },
-    //@ts-ignore
+    getSlotProps: getRootProps,
     ownerState,
-    className: classes.root,
   });
 
-  const railProps = useSlotProps({
-    elementType: SliderRail,
-    externalSlotProps: componentsProps.rail,
-    //@ts-ignore
-    ownerState,
+  const [SlotRail, railProps] = useSlot('rail', {
     className: classes.rail,
+    elementType: SliderRail,
+    externalForwardedProps: other,
+    ownerState,
   });
 
-  const trackProps = useSlotProps({
-    elementType: SliderTrack,
-    externalSlotProps: componentsProps.track,
+  const [SlotTrack, trackProps] = useSlot('track', {
     additionalProps: {
       style: trackStyle,
-    }, //@ts-ignore
-    ownerState,
+    },
     className: classes.track,
+    elementType: SliderTrack,
+    externalForwardedProps: other,
+    ownerState,
   });
 
-  const markProps = useSlotProps({
-    elementType: SliderMark,
-    externalSlotProps: componentsProps.mark, //@ts-ignore
-    ownerState,
+  const [SlotMark, markProps] = useSlot('mark', {
     className: classes.mark,
+    elementType: SliderMark,
+    externalForwardedProps: other,
+    ownerState,
   });
 
-  const markLabelProps = useSlotProps({
-    elementType: SliderMarkLabel,
-    externalSlotProps: componentsProps.markLabel, //@ts-ignore
-    ownerState,
+  const [SlotMarkLabel, markLabelProps] = useSlot('markLabel', {
     className: classes.markLabel,
+    elementType: SliderMarkLabel,
+    externalForwardedProps: other,
+    ownerState,
+    additionalProps: {
+      'aria-hidden': true,
+    },
   });
 
-  const thumbProps = useSlotProps({
-    elementType: SliderThumb, //@ts-ignore
-    getSlotProps: getThumbProps,
-    externalSlotProps: componentsProps.thumb, //@ts-ignore
-    ownerState,
+  const [SlotThumb, thumbProps] = useSlot('thumb', {
     className: classes.thumb,
+    elementType: SliderThumb,
+    externalForwardedProps: other,
+    getSlotProps: getThumbProps,
+    ownerState,
   });
 
-  const inputProps = useSlotProps({
+  const [SlotInput, inputProps] = useSlot('input', {
+    className: classes.input,
     elementType: SliderInput,
+    externalForwardedProps: other,
     getSlotProps: getHiddenInputProps,
-    externalSlotProps: componentsProps.input, //@ts-ignore
     ownerState,
   });
 
-  const valueLabelProps = useSlotProps({
-    elementType: SliderValueLabel,
-    externalSlotProps: componentsProps.valueLabel, //@ts-ignore
-    ownerState,
+  const [SlotValueLabel, valueLabelProps] = useSlot('valueLabel', {
     className: classes.valueLabel,
+    elementType: SliderValueLabel,
+    externalForwardedProps: other,
+    ownerState,
   });
 
   return (
-    <SliderRoot {...rootProps}>
-      <SliderRail {...railProps} />
-      <SliderTrack {...trackProps} />
+    <SlotRoot {...rootProps}>
+      <SlotRail {...railProps} />
+      <SlotTrack {...trackProps} />
       {marks
         .filter((mark) => mark.value >= min && mark.value <= max)
         .map((mark, index) => {
@@ -568,42 +563,40 @@ const Slider = React.forwardRef(function Slider(inProps, ref) {
             markActive = values.indexOf(mark.value) !== -1;
           } else {
             markActive =
-              (track === "normal" &&
+              (track === 'normal' &&
                 (range
-                  ? mark.value >= values[0] &&
-                    mark.value <= values[values.length - 1]
+                  ? mark.value >= values[0] && mark.value <= values[values.length - 1]
                   : mark.value <= values[0])) ||
-              (track === "inverted" &&
+              (track === 'inverted' &&
                 (range
-                  ? mark.value <= values[0] ||
-                    mark.value >= values[values.length - 1]
+                  ? mark.value <= values[0] || mark.value >= values[values.length - 1]
                   : mark.value >= values[0]));
           }
 
           return (
             <React.Fragment key={mark.value}>
-              <SliderMark
+              <SlotMark
                 data-index={index}
                 {...markProps}
+                {...(!isHostComponent(SlotMark) && {
+                  ownerState: { ...markProps.ownerState, percent },
+                })}
                 style={{ ...style, ...markProps.style }}
-                ownerState={{ ...ownerState, percent }}
                 className={clsx(markProps.className, {
                   [classes.markActive]: markActive,
                 })}
               />
               {mark.label != null ? (
-                <SliderMarkLabel
-                  aria-hidden
+                <SlotMarkLabel
                   data-index={index}
                   {...markLabelProps}
-                  ownerState={ownerState}
                   style={{ ...style, ...markLabelProps.style }}
                   className={clsx(classes.markLabel, markLabelProps.className, {
                     [classes.markLabelActive]: markActive,
                   })}
                 >
                   {mark.label}
-                </SliderMarkLabel>
+                </SlotMarkLabel>
               ) : null}
             </React.Fragment>
           );
@@ -612,7 +605,7 @@ const Slider = React.forwardRef(function Slider(inProps, ref) {
         const percent = valueToPercent(value, min, max);
         const style = axisProps[axis].offset(percent);
         return (
-          <SliderThumb
+          <SlotThumb
             key={index}
             data-index={index}
             {...thumbProps}
@@ -622,42 +615,37 @@ const Slider = React.forwardRef(function Slider(inProps, ref) {
             })}
             style={{
               ...style,
-              pointerEvents:
-                disableSwap && active !== index ? "none" : undefined,
+              pointerEvents: disableSwap && active !== index ? 'none' : undefined,
               ...thumbProps.style,
             }}
           >
-            <SliderInput
+            <SlotInput
               data-index={index}
               aria-label={getAriaLabel ? getAriaLabel(index) : ariaLabel}
               aria-valuenow={scale(value)}
               aria-valuetext={
-                getAriaValueText
-                  ? getAriaValueText(scale(value), index)
-                  : ariaValuetext
+                getAriaValueText ? getAriaValueText(scale(value), index) : ariaValuetext
               }
               value={values[index]}
               {...inputProps}
             />
-            {valueLabelDisplay !== "off" ? (
-              <SliderValueLabel
+            {valueLabelDisplay !== 'off' ? (
+              <SlotValueLabel
                 {...valueLabelProps}
                 className={clsx(valueLabelProps.className, {
                   [classes.valueLabelOpen]:
-                    open === index ||
-                    active === index ||
-                    valueLabelDisplay === "on",
+                    open === index || active === index || valueLabelDisplay === 'on',
                 })}
               >
-                {typeof valueLabelFormat === "function"
+                {typeof valueLabelFormat === 'function'
                   ? valueLabelFormat(scale(value), index)
                   : valueLabelFormat}
-              </SliderValueLabel>
+              </SlotValueLabel>
             ) : null}
-          </SliderThumb>
+          </SlotThumb>
         );
       })}
-    </SliderRoot>
+    </SlotRoot>
   );
 }) as OverridableComponent<SliderTypeMap>;
 
@@ -669,11 +657,11 @@ Slider.propTypes /* remove-proptypes */ = {
   /**
    * The label of the slider.
    */
-  "aria-label": PropTypes.string,
+  'aria-label': PropTypes.string,
   /**
    * A string value that provides a user-friendly name for the current value of the slider.
    */
-  "aria-valuetext": PropTypes.string,
+  'aria-valuetext': PropTypes.string,
   /**
    * @ignore
    */
@@ -683,46 +671,21 @@ Slider.propTypes /* remove-proptypes */ = {
    */
   classes: PropTypes.object,
   /**
+   * @ignore
+   */
+  className: PropTypes.string,
+  /**
    * The color of the component. It supports those theme colors that make sense for this component.
    * @default 'primary'
    */
   color: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf([
-      "danger",
-      "info",
-      "neutral",
-      "primary",
-      "success",
-      "warning",
-    ]),
+    PropTypes.oneOf(['danger', 'info', 'neutral', 'primary', 'success', 'warning']),
     PropTypes.string,
   ]),
   /**
-   * The component used for the root node.
-   * Either a string to use a HTML element or a component.
-   */
-  component: PropTypes.elementType,
-  /**
-   * The props used for each slot inside the Slider.
-   * @default {}
-   */
-  componentsProps: PropTypes.shape({
-    input: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    mark: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    markLabel: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    rail: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    root: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    thumb: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    track: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    valueLabel: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-  }),
-  /**
    * The default value. Use when the component is not controlled.
    */
-  defaultValue: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.number),
-    PropTypes.number,
-  ]),
+  defaultValue: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.number), PropTypes.number]),
   /**
    * If `true`, the component is disabled.
    * @default false
@@ -749,7 +712,7 @@ Slider.propTypes /* remove-proptypes */ = {
    */
   getAriaValueText: PropTypes.func,
   /**
-   * Indicates whether the theme context has rtl direction. It is set automatically.
+   * If `true` the Slider will be rendered right-to-left (with the lowest value on the right-hand side).
    * @default false
    */
   isRtl: PropTypes.bool,
@@ -764,7 +727,7 @@ Slider.propTypes /* remove-proptypes */ = {
       PropTypes.shape({
         label: PropTypes.node,
         value: PropTypes.number.isRequired,
-      })
+      }),
     ),
     PropTypes.bool,
   ]),
@@ -809,7 +772,7 @@ Slider.propTypes /* remove-proptypes */ = {
    * The component orientation.
    * @default 'horizontal'
    */
-  orientation: PropTypes.oneOf(["horizontal", "vertical"]),
+  orientation: PropTypes.oneOf(['horizontal', 'vertical']),
   /**
    * A transformation function, to change the scale of the slider.
    * @default (x) => x
@@ -821,7 +784,7 @@ Slider.propTypes /* remove-proptypes */ = {
    * @default 'md'
    */
   size: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["sm", "md", "lg"]),
+    PropTypes.oneOf(['sm', 'md', 'lg']),
     PropTypes.string,
   ]),
   /**
@@ -837,9 +800,7 @@ Slider.propTypes /* remove-proptypes */ = {
    * The system prop that allows defining system overrides as well as additional CSS styles.
    */
   sx: PropTypes.oneOfType([
-    PropTypes.arrayOf(
-      PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])
-    ),
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
     PropTypes.func,
     PropTypes.object,
   ]),
@@ -855,15 +816,12 @@ Slider.propTypes /* remove-proptypes */ = {
    * - `false` the track will render without a bar.
    * @default 'normal'
    */
-  track: PropTypes.oneOf(["inverted", "normal", false]),
+  track: PropTypes.oneOf(['inverted', 'normal', false]),
   /**
    * The value of the slider.
    * For ranged sliders, provide an array with two values.
    */
-  value: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.number),
-    PropTypes.number,
-  ]),
+  value: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.number), PropTypes.number]),
   /**
    * Controls when the value label is displayed:
    *
@@ -872,7 +830,7 @@ Slider.propTypes /* remove-proptypes */ = {
    * - `off` will never display.
    * @default 'off'
    */
-  valueLabelDisplay: PropTypes.oneOf(["auto", "off", "on"]),
+  valueLabelDisplay: PropTypes.oneOf(['auto', 'off', 'on']),
   /**
    * The format function the value label's value.
    *
@@ -888,7 +846,7 @@ Slider.propTypes /* remove-proptypes */ = {
    * @default 'solid'
    */
   variant: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["outlined", "plain", "soft", "solid"]),
+    PropTypes.oneOf(['outlined', 'plain', 'soft', 'solid']),
     PropTypes.string,
   ]),
 } as any;

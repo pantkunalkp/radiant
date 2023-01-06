@@ -1,16 +1,13 @@
-import * as React from "react";
-import { OverrideProps, OverridableStringUnion } from "@mui/types";
-import { ColorPaletteProp, SxProps } from "../styles/types";
+import * as React from 'react';
+import { OverrideProps, OverridableStringUnion } from '@mui/types';
+import { ColorPaletteProp, SxProps } from '../styles/types';
 
-export type FormControlSlot = "root";
+export type FormControlSlot = 'root';
 
 export interface FormControlPropsColorOverrides {}
 export interface FormControlPropsSizeOverrides {}
 
-export interface FormControlTypeMap<
-  P = {},
-  D extends React.ElementType = "div"
-> {
+export interface FormControlTypeMap<P = {}, D extends React.ElementType = 'div'> {
   props: P & {
     /**
      * The content of the component.
@@ -19,10 +16,7 @@ export interface FormControlTypeMap<
     /**
      * The color of the component. It supports those theme colors that make sense for this component.
      */
-    color?: OverridableStringUnion<
-      ColorPaletteProp,
-      FormControlPropsColorOverrides
-    >;
+    color?: OverridableStringUnion<ColorPaletteProp, FormControlPropsColorOverrides>;
     /**
      * If `true`, the children are in disabled state.
      * @default false
@@ -37,7 +31,7 @@ export interface FormControlTypeMap<
      * The content direction flow.
      * @default 'vertical'
      */
-    orientation?: "vertical" | "horizontal";
+    orientation?: 'vertical' | 'horizontal';
     /**
      * If `true`, the user must specify a value for the input before the owning form can be submitted.
      * If `true`, the asterisk appears on the FormLabel.
@@ -48,10 +42,7 @@ export interface FormControlTypeMap<
      * The size of the component.
      * @default 'md'
      */
-    size?: OverridableStringUnion<
-      "sm" | "md" | "lg",
-      FormControlPropsSizeOverrides
-    >;
+    size?: OverridableStringUnion<'sm' | 'md' | 'lg', FormControlPropsSizeOverrides>;
     /**
      * The system prop that allows defining system overrides as well as additional CSS styles.
      */
@@ -61,8 +52,8 @@ export interface FormControlTypeMap<
 }
 
 export type FormControlProps<
-  D extends React.ElementType = FormControlTypeMap["defaultComponent"],
-  P = { component?: React.ElementType }
+  D extends React.ElementType = FormControlTypeMap['defaultComponent'],
+  P = { component?: React.ElementType },
 > = OverrideProps<FormControlTypeMap<P, D>, D>;
 
 export interface FormControlOwnerState extends FormControlProps {}

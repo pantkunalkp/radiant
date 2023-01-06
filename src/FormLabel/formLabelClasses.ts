@@ -1,4 +1,4 @@
-import { generateUtilityClass, generateUtilityClasses } from "../className";
+import { generateUtilityClass, generateUtilityClasses } from '../className';
 
 export interface FormLabelClasses {
   /** Styles applied to the root element. */
@@ -11,12 +11,13 @@ export interface FormLabelClasses {
 export type FormLabelClassKey = keyof FormLabelClasses;
 
 export function getFormLabelUtilityClass(slot: string): string {
-  return generateUtilityClass("RadFormLabel", slot);
+  return generateUtilityClass('RadFormLabel', slot);
 }
 
-const formLabelClasses: FormLabelClasses = generateUtilityClasses(
-  "RadFormLabel",
-  ["root", "asterisk", "disabled"]
-);
+const formLabelClasses: FormLabelClasses = generateUtilityClasses('RadFormLabel', [
+  'root',
+  'asterisk',
+  'disabled'
+]);
 
 export default formLabelClasses;

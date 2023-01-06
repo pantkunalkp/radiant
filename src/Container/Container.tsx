@@ -1,17 +1,17 @@
-import { createContainer } from "@mui/system";
-import PropTypes from "prop-types";
-import { OverridableComponent } from "@mui/types";
-import { ContainerTypeMap } from "./ContainerProps";
-import { Theme } from "../styles/types/theme";
-import styled from "../styles/styled";
-import { useThemeProps } from "../styles";
+import { createContainer } from '@mui/system';
+import PropTypes from 'prop-types';
+import { OverridableComponent } from '@mui/types';
+import { ContainerTypeMap } from './ContainerProps';
+import { Theme } from '../styles/types/theme';
+import styled from '../styles/styled';
+import { useThemeProps } from '../styles';
 
 const Container = createContainer<Theme>({
   componentName: "RadContainer",
   createStyledComponent: styled("div", {
     name: "RadContainer",
     slot: "Root",
-    overridesResolver: (props, styles) => styles.root,
+    overridesResolver: (_props, styles) => styles.root,
   }),
   useThemeProps: (inProps) =>
     useThemeProps({ props: inProps, name: "RadContainer" }),
@@ -51,16 +51,14 @@ Container.propTypes /* remove-proptypes */ = {
    * @default 'lg'
    */
   maxWidth: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["xs", "sm", "md", "lg", "xl", false]),
+    PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl', false]),
     PropTypes.string,
   ]),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.
    */
   sx: PropTypes.oneOfType([
-    PropTypes.arrayOf(
-      PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])
-    ),
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
     PropTypes.func,
     PropTypes.object,
   ]),

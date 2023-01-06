@@ -1,4 +1,4 @@
-import { generateUtilityClass, generateUtilityClasses } from "../className";
+import { generateUtilityClass, generateUtilityClasses } from '../className';
 
 export interface CircularProgressClasses {
   /** Styles applied to the root element. */
@@ -23,6 +23,8 @@ export interface CircularProgressClasses {
   colorSuccess: string;
   /** Styles applied to the root element if `color="warning"`. */
   colorWarning: string;
+  /** Styles applied to the root element when color inversion is triggered. */
+  colorContext: string;
   /** Styles applied to the root element if `size="sm"`. */
   sizeSm: string;
   /** Styles applied to the root element if `size="md"`. */
@@ -42,31 +44,32 @@ export interface CircularProgressClasses {
 export type CircularProgressClassKey = keyof CircularProgressClasses;
 
 export function getCircularProgressUtilityClass(slot: string): string {
-  return generateUtilityClass("RadCircularProgress", slot);
+  return generateUtilityClass('RadCircularProgress', slot);
 }
 
 const circularProgressClasses: CircularProgressClasses = generateUtilityClasses(
-  "RadCircularProgress",
+  'RadCircularProgress',
   [
-    "root",
-    "determinate",
-    "svg",
-    "track",
-    "progress",
-    "colorPrimary",
-    "colorNeutral",
-    "colorDanger",
-    "colorInfo",
-    "colorSuccess",
-    "colorWarning",
-    "sizeSm",
-    "sizeMd",
-    "sizeLg",
-    "variantPlain",
-    "variantOutlined",
-    "variantSoft",
-    "variantSolid",
-  ]
+    'root',
+    'determinate',
+    'svg',
+    'track',
+    'progress',
+    'colorPrimary',
+    'colorNeutral',
+    'colorDanger',
+    'colorInfo',
+    'colorSuccess',
+    'colorWarning',
+    'colorContext',
+    'sizeSm',
+    'sizeMd',
+    'sizeLg',
+    'variantPlain',
+    'variantOutlined',
+    'variantSoft',
+    'variantSolid',
+  ],
 );
 
 export default circularProgressClasses;

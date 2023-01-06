@@ -1,19 +1,20 @@
-import { unstable_composeClasses as composeClasses } from "@mui/base";
-import { useSlotProps } from "@mui/base/utils";
-import { css, keyframes } from "@mui/system";
-import { OverridableComponent } from "@mui/types";
-import { unstable_capitalize as capitalize } from "@mui/utils";
-import clsx from "clsx";
-import PropTypes from "prop-types";
-import * as React from "react";
-import styled from "../styles/styled";
-import useThemeProps from "../styles/useThemeProps";
-import { getCircularProgressUtilityClass } from "./circularProgressClasses";
+import PropTypes from 'prop-types';
+import * as React from 'react';
+import clsx from 'clsx';
+import { OverridableComponent } from '@mui/types';
+import { unstable_capitalize as capitalize } from '@mui/utils';
+import { unstable_composeClasses as composeClasses } from '@mui/base';
+import { css, keyframes } from '@mui/system';
+import styled from '../styles/styled';
+import useThemeProps from '../styles/useThemeProps';
+import { useColorInversion } from '../styles/ColorInversion';
+import useSlot from '../utils/useSlot';
+import { getCircularProgressUtilityClass } from './circularProgressClasses';
 import {
   CircularProgressOwnerState,
   CircularProgressProps,
   CircularProgressTypeMap,
-} from "./CircularProgressProps";
+} from './CircularProgressProps';
 
 const circulate = keyframes({
   "0%": {
@@ -183,28 +184,25 @@ const CircularProgressProgress = styled("circle", {
  * you should use `aria-describedby` to point to the progress bar, and set the `aria-busy`
  * attribute to `true` on that region until it has finished loading.
  */
-const CircularProgress = React.forwardRef(function CircularProgress(
-  inProps,
-  ref
-) {
+const CircularProgress = React.forwardRef(function CircularProgress(inProps, ref) {
   const props = useThemeProps<typeof inProps & CircularProgressProps>({
     props: inProps,
-    name: "RadCircularProgress",
+    name: 'RadCircularProgress',
   });
 
   const {
-    componentsProps = {},
-    component = "span",
     children,
     className,
-    color = "primary",
-    size = "md",
-    variant = "soft",
+    color: colorProp = 'primary',
+    size = 'md',
+    variant = 'soft',
     thickness,
     determinate = false,
     value = determinate ? 0 : 25, // `25` is the 1/4 of the circle.
     ...other
   } = props;
+  const { getColor } = useColorInversion(variant);
+  const color = getColor(inProps.color, colorProp);
 
   const ownerState = {
     ...props,
@@ -219,61 +217,57 @@ const CircularProgress = React.forwardRef(function CircularProgress(
 
   const classes = useUtilityClasses(ownerState);
 
-  const rootProps = useSlotProps({
+  const [SlotRoot, rootProps] = useSlot('root', {
+    ref,
+    className: clsx(classes.root, className),
     elementType: CircularProgressRoot,
-    externalSlotProps: componentsProps.root,
     externalForwardedProps: other,
     ownerState,
     additionalProps: {
-      ref,
-      as: component,
-      role: "progressbar",
+      role: 'progressbar',
       style: {
         // Setting this CSS varaible via inline-style
         // prevents the generation of new CSS every time
         // `value` prop updates
-        "--CircularProgress-percent": value,
+        '--CircularProgress-percent': value,
       },
+      ...(value &&
+        determinate && {
+          'aria-valuenow':
+            typeof value === 'number' ? Math.round(value) : Math.round(Number(value || 0)),
+        }),
     },
-    className: clsx(classes.root, className),
-    ...(value &&
-      determinate && {
-        "aria-valuenow":
-          typeof value === "number"
-            ? Math.round(value)
-            : Math.round(Number(value || 0)),
-      }),
   });
 
-  const svgProps = useSlotProps({
-    elementType: CircularProgressSvg,
-    externalSlotProps: componentsProps.svg,
-    ownerState,
+  const [SlotSvg, svgProps] = useSlot('svg', {
     className: classes.svg,
+    elementType: CircularProgressSvg,
+    externalForwardedProps: other,
+    ownerState,
   });
 
-  const trackProps = useSlotProps({
-    elementType: CircularProgressTrack,
-    externalSlotProps: componentsProps.track,
-    ownerState,
+  const [SlotTrack, trackProps] = useSlot('track', {
     className: classes.track,
+    elementType: CircularProgressTrack,
+    externalForwardedProps: other,
+    ownerState,
   });
 
-  const progressProps = useSlotProps({
-    elementType: CircularProgressProgress,
-    externalSlotProps: componentsProps.progress,
-    ownerState,
+  const [SlotProgress, progressProps] = useSlot('progress', {
     className: classes.progress,
+    elementType: CircularProgressProgress,
+    externalForwardedProps: other,
+    ownerState,
   });
 
   return (
-    <CircularProgressRoot {...rootProps}>
-      <CircularProgressSvg {...svgProps}>
-        <CircularProgressTrack {...trackProps} />
-        <CircularProgressProgress {...progressProps} />
-      </CircularProgressSvg>
+    <SlotRoot {...rootProps}>
+      <SlotSvg {...svgProps}>
+        <SlotTrack {...trackProps} />
+        <SlotProgress {...progressProps} />
+      </SlotSvg>
       {children}
-    </CircularProgressRoot>
+    </SlotRoot>
   );
 }) as OverridableComponent<CircularProgressTypeMap>;
 
@@ -295,31 +289,9 @@ CircularProgress.propTypes /* remove-proptypes */ = {
    * @default 'primary'
    */
   color: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf([
-      "danger",
-      "info",
-      "neutral",
-      "primary",
-      "success",
-      "warning",
-    ]),
+    PropTypes.oneOf(['danger', 'info', 'neutral', 'primary', 'success', 'warning']),
     PropTypes.string,
   ]),
-  /**
-   * The component used for the root node.
-   * Either a string to use a HTML element or a component.
-   */
-  component: PropTypes.elementType,
-  /**
-   * The props used for each slot inside the CircularProgress.
-   * @default {}
-   */
-  componentsProps: PropTypes.shape({
-    progress: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    root: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    svg: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    track: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-  }),
   /**
    * The boolean to select a variant.
    * Use indeterminate when there is no progress value.
@@ -332,16 +304,14 @@ CircularProgress.propTypes /* remove-proptypes */ = {
    * @default 'md'
    */
   size: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["sm", "md", "lg"]),
+    PropTypes.oneOf(['sm', 'md', 'lg']),
     PropTypes.string,
   ]),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.
    */
   sx: PropTypes.oneOfType([
-    PropTypes.arrayOf(
-      PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])
-    ),
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
     PropTypes.func,
     PropTypes.object,
   ]),
@@ -361,7 +331,7 @@ CircularProgress.propTypes /* remove-proptypes */ = {
    * @default 'soft'
    */
   variant: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["outlined", "plain", "soft", "solid"]),
+    PropTypes.oneOf(['outlined', 'plain', 'soft', 'solid']),
     PropTypes.string,
   ]),
 } as any;

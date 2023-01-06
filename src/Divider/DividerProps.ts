@@ -1,13 +1,13 @@
-import * as React from "react";
-import { OverridableStringUnion, OverrideProps } from "@mui/types";
-import { SxProps } from "../styles/types";
-import { DividerClasses } from "./dividerClasses";
+import * as React from 'react';
+import { OverridableStringUnion, OverrideProps } from '@mui/types';
+import { SxProps } from '../styles/types';
+import { DividerClasses } from './dividerClasses';
 
-export type DividerSlot = "root";
+export type DividerSlot = 'root';
 
 export interface DividerInsetOverrides {}
 
-export interface DividerTypeMap<P = {}, D extends React.ElementType = "hr"> {
+export interface DividerTypeMap<P = {}, D extends React.ElementType = 'hr'> {
   props: P & {
     /**
      * The content of the component.
@@ -20,12 +20,12 @@ export interface DividerTypeMap<P = {}, D extends React.ElementType = "hr"> {
     /**
      * The styles applied to the divider to shrink or stretch the line based on the orientation.
      */
-    inset?: OverridableStringUnion<"none" | "context", DividerInsetOverrides>;
+    inset?: OverridableStringUnion<'none' | 'context', DividerInsetOverrides>;
     /**
      * The component orientation.
      * @default 'horizontal'
      */
-    orientation?: "horizontal" | "vertical";
+    orientation?: 'horizontal' | 'vertical';
     /**
      * The system prop that allows defining system overrides as well as additional CSS styles.
      */
@@ -35,10 +35,10 @@ export interface DividerTypeMap<P = {}, D extends React.ElementType = "hr"> {
 }
 
 export type DividerProps<
-  D extends React.ElementType = DividerTypeMap["defaultComponent"],
+  D extends React.ElementType = DividerTypeMap['defaultComponent'],
   P = {
     component?: React.ElementType;
-  }
+  },
 > = OverrideProps<DividerTypeMap<P, D>, D>;
 
 export interface DividerOwnerState extends DividerProps {}

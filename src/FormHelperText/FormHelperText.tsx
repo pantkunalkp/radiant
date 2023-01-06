@@ -1,17 +1,14 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import { OverridableComponent } from "@mui/types";
-import { unstable_useForkRef as useForkRef } from "@mui/utils";
-import composeClasses from "@mui/base/composeClasses";
-import { useSlotProps } from "@mui/base/utils";
-import { styled, useThemeProps } from "../styles";
-import {
-  FormHelperTextProps,
-  FormHelperTextTypeMap,
-} from "./FormHelperTextProps";
-import { getFormHelperTextUtilityClass } from "./formHelperTextClasses";
-import FormControlContext from "../FormControl/FormControlContext";
-import formLabelClasses from "../FormLabel/formLabelClasses";
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import { OverridableComponent } from '@mui/types';
+import { unstable_useForkRef as useForkRef } from '@mui/utils';
+import composeClasses from '@mui/base/composeClasses';
+import { useSlotProps } from '@mui/base/utils';
+import { styled, useThemeProps } from '../styles';
+import { FormHelperTextProps, FormHelperTextTypeMap } from './FormHelperTextProps';
+import { getFormHelperTextUtilityClass } from './formHelperTextClasses';
+import FormControlContext from '../FormControl/FormControlContext';
+import formLabelClasses from '../FormLabel/formLabelClasses';
 
 const useUtilityClasses = () => {
   const slots = {
@@ -73,7 +70,7 @@ const FormHelperText = React.forwardRef(function FormHelperText(inProps, ref) {
     additionalProps: {
       ref: handleRef,
       as: component,
-      id: formControl?.["aria-describedby"],
+      id: formControl?.['aria-describedby'],
     },
     className: classes.root,
   });
@@ -103,9 +100,7 @@ FormHelperText.propTypes /* remove-proptypes */ = {
    * The system prop that allows defining system overrides as well as additional CSS styles.
    */
   sx: PropTypes.oneOfType([
-    PropTypes.arrayOf(
-      PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])
-    ),
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
     PropTypes.func,
     PropTypes.object,
   ]),

@@ -1,8 +1,9 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import { GlobalStyles } from "@mui/system";
-import { Theme, DefaultColorScheme, ColorSystem } from "../styles/types";
-import { CssBaselineProps } from "./CssBaselineProps";
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import { GlobalStyles } from '@mui/system';
+import { Theme, DefaultColorScheme, ColorSystem } from '../styles/types';
+import { Components } from '../styles/components';
+import { CssBaselineProps } from './CssBaselineProps';
 
 /**
  * Kickstart an elegant, consistent, and simple baseline to build upon.
@@ -13,60 +14,60 @@ function CssBaseline({
 }: CssBaselineProps) {
   return (
     <React.Fragment>
-      <GlobalStyles
-        styles={(theme: Theme) => {
-          const colorSchemeStyles: Record<string, any> = {};
-          if (!disableColorScheme) {
-            // The CssBaseline is wrapped inside a CssVarsProvider
-            (
-              Object.entries(theme.colorSchemes) as Array<
-                [DefaultColorScheme, ColorSystem]
-              >
-            ).forEach(([key, scheme]) => {
-              colorSchemeStyles[
-                theme.getColorSchemeSelector(key).replace(/\s*&/, "")
-              ] = {
-                colorScheme: scheme.palette?.mode,
-              };
-            });
-          }
-          return {
-            html: {
-              WebkitFontSmoothing: "antialiased",
-              MozOsxFontSmoothing: "grayscale",
-              // Change from `box-sizing: content-box` so that `width`
-              // is not affected by `padding` or `border`.
-              boxSizing: "border-box",
-              // Fix font resize problem in iOS
-              WebkitTextSizeAdjust: "100%",
+    <GlobalStyles
+      styles={(theme: Theme) => {
+        const colorSchemeStyles: Record<string, any> = {};
+        if (!disableColorScheme) {
+          // The CssBaseline is wrapped inside a CssVarsProvider
+          (
+            Object.entries(theme.colorSchemes) as Array<[DefaultColorScheme, ColorSystem]>
+          ).forEach(([key, scheme]) => {
+            colorSchemeStyles[theme.getColorSchemeSelector(key).replace(/\s*&/, '')] = {
+              colorScheme: scheme.palette?.mode,
+            };
+          });
+        }
+        const defaultTypographyLevel =
+          (theme as unknown as { components: Components<Theme> }).components?.RadTypography
+            ?.defaultProps?.level ?? 'body1';
+        return {
+          html: {
+            WebkitFontSmoothing: 'antialiased',
+            MozOsxFontSmoothing: 'grayscale',
+            // Change from `box-sizing: content-box` so that `width`
+            // is not affected by `padding` or `border`.
+            boxSizing: 'border-box',
+            // Fix font resize problem in iOS
+            WebkitTextSizeAdjust: '100%',
+          },
+          '*, *::before, *::after': {
+            boxSizing: 'inherit',
+          },
+          'strong, b': {
+            fontWeight: 'bold',
+          },
+          body: {
+            margin: 0, // Remove the margin in all browsers.
+            color: theme.vars.palette.text.primary,
+            fontFamily: theme.vars.fontFamily.body,
+            ...(theme.typography as any)[defaultTypographyLevel],
+            backgroundColor: theme.vars.palette.background.body,
+            '@media print': {
+              // Save printer ink.
+              backgroundColor: theme.vars.palette.common.white,
             },
-            "*, *::before, *::after": {
-              boxSizing: "inherit",
+            // Add support for document.body.requestFullScreen().
+            // Other elements, if background transparent, are not supported.
+            '&::backdrop': {
+              backgroundColor: theme.vars.palette.background.backdrop,
             },
-            "strong, b": {
-              fontWeight: "bold",
-            },
-            body: {
-              margin: 0, // Remove the margin in all browsers.
-              color: theme.vars.palette.text.primary,
-              ...(theme.typography.body1 as any),
-              backgroundColor: theme.vars.palette.background.body,
-              "@media print": {
-                // Save printer ink.
-                backgroundColor: theme.vars.palette.common.white,
-              },
-              // Add support for document.body.requestFullScreen().
-              // Other elements, if background transparent, are not supported.
-              "&::backdrop": {
-                backgroundColor: theme.vars.palette.background.backdrop,
-              },
-            },
-            ...colorSchemeStyles,
-          };
-        }}
-      />
-      {children}
-    </React.Fragment>
+          },
+          ...colorSchemeStyles,
+        };
+      }}
+    />
+    {children}
+  </React.Fragment>
   );
 }
 

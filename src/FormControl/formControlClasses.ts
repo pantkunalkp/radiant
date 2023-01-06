@@ -1,4 +1,4 @@
-import { generateUtilityClass, generateUtilityClasses } from "../className";
+import { generateUtilityClass, generateUtilityClasses } from '../className';
 
 export interface FormControlClasses {
   /** Styles applied to the root element. */
@@ -30,25 +30,22 @@ export interface FormControlClasses {
 export type FormControlClassKey = keyof FormControlClasses;
 
 export function getFormControlUtilityClass(slot: string): string {
-  return generateUtilityClass("RadFormControl", slot);
+  return generateUtilityClass('RadFormControl', slot);
 }
 
-const formControlClasses: FormControlClasses = generateUtilityClasses(
-  "RadFormControl",
-  [
-    "root",
-    "error",
-    "disabled",
-    "colorPrimary",
-    "colorNeutral",
-    "colorDanger",
-    "colorInfo",
-    "colorSuccess",
-    "colorWarning",
-    "sizeSm",
-    "sizeMd",
-    "sizeLg",
-  ]
-);
+const formControlClasses: FormControlClasses = generateUtilityClasses('RadFormControl', [
+  'root',
+  'error',
+  'disabled',
+  'colorPrimary',
+  'colorNeutral',
+  'colorDanger',
+  'colorInfo',
+  'colorSuccess',
+  'colorWarning',
+  'sizeSm',
+  'sizeMd',
+  'sizeLg',
+]);
 
 export default formControlClasses;

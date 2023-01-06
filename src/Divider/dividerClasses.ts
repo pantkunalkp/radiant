@@ -1,4 +1,4 @@
-import { generateUtilityClass, generateUtilityClasses } from "../className";
+import { generateUtilityClass, generateUtilityClasses } from '../className';
 
 export interface DividerClasses {
   /** Styles applied to the root element. */
@@ -14,14 +14,14 @@ export interface DividerClasses {
 export type DividerClassKey = keyof DividerClasses;
 
 export function getDividerUtilityClass(slot: string): string {
-  return generateUtilityClass("RadDivider", slot);
+  return generateUtilityClass('RadDivider', slot);
 }
 
-const dividerClasses: DividerClasses = generateUtilityClasses("RadDivider", [
-  "root",
-  "vertical",
-  "insetContext",
-  "insetNone",
+const dividerClasses: DividerClasses = generateUtilityClasses('RadDivider', [
+  'root',
+  'vertical',
+  'insetContext',
+  'insetNone',
 ]);
 
 export default dividerClasses;

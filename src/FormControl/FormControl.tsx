@@ -1,23 +1,14 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import clsx from "clsx";
-import { OverridableComponent } from "@mui/types";
-import {
-  unstable_useId as useId,
-  unstable_capitalize as capitalize,
-} from "@mui/utils";
-import composeClasses from "@mui/base/composeClasses";
-import { useThemeProps } from "../styles";
-import styled from "../styles/styled";
-import FormControlContext from "./FormControlContext";
-import formControlClasses, {
-  getFormControlUtilityClass,
-} from "./formControlClasses";
-import {
-  FormControlProps,
-  FormControlOwnerState,
-  FormControlTypeMap,
-} from "./FormControlProps";
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import clsx from 'clsx';
+import { OverridableComponent } from '@mui/types';
+import { unstable_useId as useId, unstable_capitalize as capitalize } from '@mui/utils';
+import composeClasses from '@mui/base/composeClasses';
+import { useThemeProps } from '../styles';
+import styled from '../styles/styled';
+import FormControlContext from './FormControlContext';
+import formControlClasses, { getFormControlUtilityClass } from './formControlClasses';
+import { FormControlProps, FormControlOwnerState, FormControlTypeMap } from './FormControlProps';
 
 const useUtilityClasses = (ownerState: FormControlOwnerState) => {
   const { disabled, error, size, color } = ownerState;
@@ -129,30 +120,32 @@ const FormControl = React.forwardRef(function FormControl(inProps, ref) {
   }
 
   const classes = useUtilityClasses(ownerState);
+  const formControlContextValue = React.useMemo(
+    () => ({
+      disabled,
+      required,
+      error,
+      color,
+      size,
+      htmlFor: id,
+      labelId: `${id}-label`,
+      'aria-describedby': helperText ? `${id}-helper-text` : undefined,
+      setHelperText,
+      registerEffect: registerEffect!,
+    }),
+    [color, disabled, error, helperText, id, registerEffect, required, size],
+  );
 
   return (
-    <FormControlContext.Provider
-      value={{
-        disabled,
-        required,
-        error,
-        color,
-        size,
-        htmlFor: id,
-        labelId,
-        "aria-describedby": helperText ? helperTextId : undefined,
-        setHelperText,
-        registerEffect: registerEffect!,
-      }}
-    >
-      <FormControlRoot
-        as={component}
-        ownerState={ownerState}
-        className={clsx(classes.root, className)}
-        ref={ref}
-        {...other}
-      />
-    </FormControlContext.Provider>
+    <FormControlContext.Provider value={formControlContextValue}>
+    <FormControlRoot
+      as={component}
+      ownerState={ownerState}
+      className={clsx(classes.root, className)}
+      ref={ref}
+      {...other}
+    />
+  </FormControlContext.Provider>
   );
 }) as OverridableComponent<FormControlTypeMap>;
 
@@ -173,14 +166,7 @@ FormControl.propTypes /* remove-proptypes */ = {
    * The color of the component. It supports those theme colors that make sense for this component.
    */
   color: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf([
-      "danger",
-      "info",
-      "neutral",
-      "primary",
-      "success",
-      "warning",
-    ]),
+    PropTypes.oneOf(['danger', 'info', 'neutral', 'primary', 'success', 'warning']),
     PropTypes.string,
   ]),
   /**
@@ -206,7 +192,7 @@ FormControl.propTypes /* remove-proptypes */ = {
    * The content direction flow.
    * @default 'vertical'
    */
-  orientation: PropTypes.oneOf(["horizontal", "vertical"]),
+  orientation: PropTypes.oneOf(['horizontal', 'vertical']),
   /**
    * If `true`, the user must specify a value for the input before the owning form can be submitted.
    * If `true`, the asterisk appears on the FormLabel.
@@ -218,16 +204,14 @@ FormControl.propTypes /* remove-proptypes */ = {
    * @default 'md'
    */
   size: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["sm", "md", "lg"]),
+    PropTypes.oneOf(['sm', 'md', 'lg']),
     PropTypes.string,
   ]),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.
    */
   sx: PropTypes.oneOfType([
-    PropTypes.arrayOf(
-      PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])
-    ),
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
     PropTypes.func,
     PropTypes.object,
   ]),

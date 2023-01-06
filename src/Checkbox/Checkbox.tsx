@@ -1,20 +1,18 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import { OverridableComponent } from "@mui/types";
-import {
-  unstable_useId as useId,
-  unstable_capitalize as capitalize,
-} from "@mui/utils";
-import { unstable_composeClasses as composeClasses } from "@mui/base";
-import { useSlotProps } from "@mui/base/utils";
-import { useSwitch } from "@mui/base/SwitchUnstyled";
-import { styled, useThemeProps } from "../styles";
-import checkboxClasses, { getCheckboxUtilityClass } from "./checkboxClasses";
-import { CheckboxOwnerState, CheckboxTypeMap } from "./CheckboxProps";
-import CheckIcon from "../internal/svg-icons/Check";
-import IndeterminateIcon from "../internal/svg-icons/HorizontalRule";
-import { TypographyContext } from "../Typography/Typography";
-import FormControlContext from "../FormControl/FormControlContext";
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import { OverridableComponent } from '@mui/types';
+import { unstable_useId as useId, unstable_capitalize as capitalize } from '@mui/utils';
+import { unstable_composeClasses as composeClasses } from '@mui/base';
+import { useSwitch } from '@mui/base/SwitchUnstyled';
+import { styled, useThemeProps } from '../styles';
+import { useColorInversion } from '../styles/ColorInversion';
+import useSlot from '../utils/useSlot';
+import checkboxClasses, { getCheckboxUtilityClass } from './checkboxClasses';
+import { CheckboxOwnerState, CheckboxTypeMap } from './CheckboxProps';
+import CheckIcon from '../internal/svg-icons/Check';
+import IndeterminateIcon from '../internal/svg-icons/HorizontalRule';
+import { TypographyContext } from '../Typography/Typography';
+import FormControlContext from '../FormControl/FormControlContext';
 
 const useUtilityClasses = (ownerState: CheckboxOwnerState) => {
   const { checked, disabled, disableIcon, focusVisible, color, variant, size } =
@@ -225,8 +223,6 @@ const Checkbox = React.forwardRef(function Checkbox(inProps, ref) {
     uncheckedIcon,
     checkedIcon = defaultCheckedIcon,
     label,
-    component,
-    componentsProps = {},
     defaultChecked,
     disabled: disabledExternalProp,
     disableIcon = false,
@@ -243,8 +239,8 @@ const Checkbox = React.forwardRef(function Checkbox(inProps, ref) {
     required,
     value,
     color: colorProp,
-    variant,
-    size: sizeProp = "md",
+    variant: variantProp,
+    size: sizeProp = 'md',
     ...other
   } = props;
 
@@ -252,9 +248,8 @@ const Checkbox = React.forwardRef(function Checkbox(inProps, ref) {
   const disabledProp =
     inProps.disabled ?? formControl?.disabled ?? disabledExternalProp;
   const size = inProps.size ?? formControl?.size ?? sizeProp;
-  const color = formControl?.error
-    ? "danger"
-    : inProps.color ?? formControl?.color ?? colorProp;
+
+  
 
   if (process.env.NODE_ENV !== "production") {
     const registerEffect = formControl?.registerEffect;
@@ -283,11 +278,18 @@ const Checkbox = React.forwardRef(function Checkbox(inProps, ref) {
   const { getInputProps, checked, disabled, focusVisible } =
     useSwitch(useCheckboxProps);
 
-  const isCheckboxActive = checked || indeterminate;
-  const activeColor = color || "primary";
-  const inactiveColor = color || "neutral";
-  const activeVariant = variant || "solid";
-  const inactiveVariant = variant || "outlined";
+    const isCheckboxActive = checked || indeterminate;
+    const activeVariant = variantProp || 'solid';
+    const inactiveVariant = variantProp || 'outlined';
+    const variant = isCheckboxActive ? activeVariant : inactiveVariant;
+    const { getColor } = useColorInversion(variant);
+    const color = getColor(
+      inProps.color,
+      formControl?.error ? 'danger' : formControl?.color ?? colorProp,
+    );
+  
+    const activeColor = color || 'primary';
+    const inactiveColor = color || 'neutral';
 
   const ownerState = {
     ...props,
@@ -297,84 +299,81 @@ const Checkbox = React.forwardRef(function Checkbox(inProps, ref) {
     overlay,
     focusVisible,
     color: isCheckboxActive ? activeColor : inactiveColor,
-    variant: isCheckboxActive ? activeVariant : inactiveVariant,
+    variant,
     size,
   };
 
   const classes = useUtilityClasses(ownerState);
 
-  const rootProps = useSlotProps({
+  const [SlotRoot, rootProps] = useSlot('root', {
+    ref,
+    className: classes.root,
     elementType: CheckboxRoot,
-    externalSlotProps: componentsProps.root,
     externalForwardedProps: other,
     ownerState,
-    additionalProps: {
-      ref,
-      as: component,
-    },
-    className: classes.root,
   });
 
-  const checkboxProps = useSlotProps({
-    elementType: CheckboxCheckbox,
-    externalSlotProps: componentsProps.checkbox,
-    ownerState,
+  const [SlotCheckbox, checkboxProps] = useSlot('checkbox', {
     className: classes.checkbox,
+    elementType: CheckboxCheckbox,
+    externalForwardedProps: other,
+    ownerState,
   });
 
-  const actionProps = useSlotProps({
-    elementType: CheckboxAction,
-    externalSlotProps: componentsProps.action,
-    ownerState,
+  const [SlotAction, actionProps] = useSlot('action', {
     className: classes.action,
+    elementType: CheckboxAction,
+    externalForwardedProps: other,
+    ownerState,
   });
 
-  const inputProps = useSlotProps({
-    elementType: CheckboxInput,
-    getSlotProps: getInputProps,
-    externalSlotProps: componentsProps.input,
-    ownerState,
+  const [SlotInput, inputProps] = useSlot('input', {
     additionalProps: {
       id,
       name,
       value,
       readOnly,
-      required,
-      "aria-describedby": formControl?.["aria-describedby"],
+      required: required ?? formControl?.required,
+      'aria-describedby': formControl?.['aria-describedby'],
       ...(indeterminate && {
         // https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-checked#values
-        "aria-checked": "mixed" as const,
+        'aria-checked': 'mixed' as const,
       }),
     },
     className: classes.input,
+    elementType: CheckboxInput,
+    externalForwardedProps: other,
+    getSlotProps: getInputProps,
+    ownerState,
   });
 
-  const labelProps = useSlotProps({
-    elementType: CheckboxLabel,
-    externalSlotProps: componentsProps.label,
-    ownerState,
+  const [SlotLabel, labelProps] = useSlot('label', {
     additionalProps: {
       htmlFor: id,
     },
     className: classes.label,
+    elementType: CheckboxLabel,
+    externalForwardedProps: other,
+    ownerState,
   });
 
+
   return (
-    <CheckboxRoot {...rootProps}>
-      <CheckboxCheckbox {...checkboxProps}>
-        <CheckboxAction {...actionProps}>
-          <CheckboxInput {...inputProps} />
-        </CheckboxAction>
+    <SlotRoot {...rootProps}>
+      <SlotCheckbox {...checkboxProps}>
+        <SlotAction {...actionProps}>
+          <SlotInput {...inputProps} />
+        </SlotAction>
         {indeterminate && !checked && !disableIcon && indeterminateIcon}
         {checked && !disableIcon && checkedIcon}
         {!checked && !disableIcon && !indeterminate && uncheckedIcon}
-      </CheckboxCheckbox>
+      </SlotCheckbox>
       {label && (
         <TypographyContext.Provider value>
-          <CheckboxLabel {...labelProps}>{label}</CheckboxLabel>
+          <SlotLabel {...labelProps}>{label}</SlotLabel>
         </TypographyContext.Provider>
       )}
-    </CheckboxRoot>
+    </SlotRoot>
   );
 }) as OverridableComponent<CheckboxTypeMap>;
 
@@ -405,25 +404,9 @@ Checkbox.propTypes /* remove-proptypes */ = {
    * @default 'neutral'
    */
   color: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["danger", "info", "primary", "success", "warning"]),
+    PropTypes.oneOf(['danger', 'info', 'primary', 'success', 'warning']),
     PropTypes.string,
   ]),
-  /**
-   * The component used for the root node.
-   * Either a string to use a HTML element or a component.
-   */
-  component: PropTypes.elementType,
-  /**
-   * The props used for each slot inside the component.
-   * @default {}
-   */
-  componentsProps: PropTypes.shape({
-    action: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    checkbox: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    input: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    label: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    root: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-  }),
   /**
    * The default checked state. Use when the component is not controlled.
    */
@@ -501,16 +484,14 @@ Checkbox.propTypes /* remove-proptypes */ = {
    * @default 'md'
    */
   size: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["sm", "md", "lg"]),
+    PropTypes.oneOf(['sm', 'md', 'lg']),
     PropTypes.string,
   ]),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.
    */
   sx: PropTypes.oneOfType([
-    PropTypes.arrayOf(
-      PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])
-    ),
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
     PropTypes.func,
     PropTypes.object,
   ]),
@@ -532,7 +513,7 @@ Checkbox.propTypes /* remove-proptypes */ = {
    * @default 'solid'
    */
   variant: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["outlined", "plain", "soft", "solid"]),
+    PropTypes.oneOf(['outlined', 'plain', 'soft', 'solid']),
     PropTypes.string,
   ]),
 } as any;

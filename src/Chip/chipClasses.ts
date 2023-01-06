@@ -1,4 +1,4 @@
-import { generateUtilityClass, generateUtilityClasses } from "../className";
+import { generateUtilityClass, generateUtilityClasses } from '../className';
 
 export interface ChipClasses {
   /** Styles applied to the root element. */
@@ -15,6 +15,8 @@ export interface ChipClasses {
   colorSuccess: string;
   /** Styles applied to the root element if `color="warning"`. */
   colorWarning: string;
+  /** Styles applied to the root element when color inversion is triggered. */
+  colorContext: string;
   /** State class applied to the root element if `disabled={true}`. */
   disabled: string;
   /** Styles applied to the endDecorator element if supplied. */
@@ -50,33 +52,34 @@ export interface ChipClasses {
 export type ChipClassKey = keyof ChipClasses;
 
 export function getChipUtilityClass(slot: string): string {
-  return generateUtilityClass("RadChip", slot);
+  return generateUtilityClass('RadChip', slot);
 }
 
-const chipClasses: ChipClasses = generateUtilityClasses("RadChip", [
-  "root",
-  "clickable",
-  "colorPrimary",
-  "colorNeutral",
-  "colorDanger",
-  "colorInfo",
-  "colorSuccess",
-  "colorWarning",
-  "disabled",
-  "endDecorator",
-  "focusVisible",
-  "label",
-  "labelSm",
-  "labelMd",
-  "labelLg",
-  "sizeSm",
-  "sizeMd",
-  "sizeLg",
-  "startDecorator",
-  "variantPlain",
-  "variantSolid",
-  "variantSoft",
-  "variantOutlined",
+const chipClasses: ChipClasses = generateUtilityClasses('RadChip', [
+  'root',
+  'clickable',
+  'colorPrimary',
+  'colorNeutral',
+  'colorDanger',
+  'colorInfo',
+  'colorSuccess',
+  'colorWarning',
+  'colorContext',
+  'disabled',
+  'endDecorator',
+  'focusVisible',
+  'label',
+  'labelSm',
+  'labelMd',
+  'labelLg',
+  'sizeSm',
+  'sizeMd',
+  'sizeLg',
+  'startDecorator',
+  'variantPlain',
+  'variantSolid',
+  'variantSoft',
+  'variantOutlined',
 ]);
 
 export default chipClasses;

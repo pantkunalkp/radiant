@@ -1,4 +1,4 @@
-import { generateUtilityClass, generateUtilityClasses } from "../className";
+import { generateUtilityClass, generateUtilityClasses } from '../className';
 
 export interface CardClasses {
   /** Styles applied to the root element. */
@@ -15,6 +15,8 @@ export interface CardClasses {
   colorSuccess: string;
   /** Styles applied to the root element if `color="warning"`. */
   colorWarning: string;
+  /** Styles applied to the root element when color inversion is triggered. */
+  colorContext: string;
   /** Styles applied to the root element if `variant="plain"`. */
   variantPlain: string;
   /** Styles applied to the root element if `variant="outlined"`. */
@@ -36,25 +38,26 @@ export interface CardClasses {
 export type CardClassKey = keyof CardClasses;
 
 export function getCardUtilityClass(slot: string): string {
-  return generateUtilityClass("RadCard", slot);
+  return generateUtilityClass('RadCard', slot);
 }
 
-const cardClasses: CardClasses = generateUtilityClasses("RadCard", [
-  "root",
-  "colorPrimary",
-  "colorNeutral",
-  "colorDanger",
-  "colorInfo",
-  "colorSuccess",
-  "colorWarning",
-  "variantPlain",
-  "variantOutlined",
-  "variantSoft",
-  "variantSolid",
-  "sizeSm",
-  "sizeMd",
-  "sizeLg",
-  "row",
+const cardClasses: CardClasses = generateUtilityClasses('RadCard', [
+  'root',
+  'colorPrimary',
+  'colorNeutral',
+  'colorDanger',
+  'colorInfo',
+  'colorSuccess',
+  'colorWarning',
+  'colorContext',
+  'variantPlain',
+  'variantOutlined',
+  'variantSoft',
+  'variantSolid',
+  'sizeSm',
+  'sizeMd',
+  'sizeLg',
+  'row',
 ]);
 
 export default cardClasses;

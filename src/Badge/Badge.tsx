@@ -161,7 +161,6 @@ const Badge = React.forwardRef(function Badge(inProps, ref) {
     className,
     component = "span",
         //@ts-ignore
-    badgeInset: badgeInsetProp = 0,
     children,
     size: sizeProp = 'md',
     color: colorProp = 'primary',

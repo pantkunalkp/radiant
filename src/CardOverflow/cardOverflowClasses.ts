@@ -1,4 +1,4 @@
-import { generateUtilityClass, generateUtilityClasses } from "../className";
+import { generateUtilityClass, generateUtilityClasses } from '../className';
 
 export interface CardOverflowClasses {
   /** Styles applied to the root element. */
@@ -15,6 +15,8 @@ export interface CardOverflowClasses {
   colorSuccess: string;
   /** Styles applied to the root element if `color="warning"`. */
   colorWarning: string;
+  /** Styles applied to the root element when color inversion is triggered. */
+  colorContext: string;
   /** Styles applied to the root element if `variant="plain"`. */
   variantPlain: string;
   /** Styles applied to the root element if `variant="outlined"`. */
@@ -28,24 +30,22 @@ export interface CardOverflowClasses {
 export type CardOverflowClassKey = keyof CardOverflowClasses;
 
 export function getCardOverflowUtilityClass(slot: string): string {
-  return generateUtilityClass("RadCardOverflow", slot);
+  return generateUtilityClass('RadCardOverflow', slot);
 }
 
-const aspectRatioClasses: CardOverflowClasses = generateUtilityClasses(
-  "RadCardOverflow",
-  [
-    "root",
-    "colorPrimary",
-    "colorNeutral",
-    "colorDanger",
-    "colorInfo",
-    "colorSuccess",
-    "colorWarning",
-    "variantPlain",
-    "variantOutlined",
-    "variantSoft",
-    "variantSolid",
-  ]
-);
+const aspectRatioClasses: CardOverflowClasses = generateUtilityClasses('RadCardOverflow', [
+  'root',
+  'colorPrimary',
+  'colorNeutral',
+  'colorDanger',
+  'colorInfo',
+  'colorSuccess',
+  'colorWarning',
+  'colorContext',
+  'variantPlain',
+  'variantOutlined',
+  'variantSoft',
+  'variantSolid',
+]);
 
 export default aspectRatioClasses;

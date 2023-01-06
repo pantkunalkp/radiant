@@ -1,4 +1,4 @@
-import { generateUtilityClass, generateUtilityClasses } from "../className";
+import { generateUtilityClass, generateUtilityClasses } from '../className';
 
 export interface CheckboxClasses {
   /** Styles applied to the root element. */
@@ -31,6 +31,8 @@ export interface CheckboxClasses {
   colorSuccess: string;
   /** Styles applied to the root element if `color="warning"`. */
   colorWarning: string;
+  /** Styles applied to the root element when color inversion is triggered. */
+  colorContext: string;
   /** Styles applied to the root element if `size="sm"`. */
   sizeSm: string;
   /** Styles applied to the root element if `size="md"`. */
@@ -48,31 +50,32 @@ export interface CheckboxClasses {
 export type CheckboxClassKey = keyof CheckboxClasses;
 
 export function getCheckboxUtilityClass(slot: string): string {
-  return generateUtilityClass("RadCheckbox", slot);
+  return generateUtilityClass('RadCheckbox', slot);
 }
 
-const checkboxClasses: CheckboxClasses = generateUtilityClasses("RadCheckbox", [
-  "root",
-  "checkbox",
-  "action",
-  "input",
-  "label",
-  "checked",
-  "disabled",
-  "focusVisible",
-  "indeterminate",
-  "colorPrimary",
-  "colorDanger",
-  "colorInfo",
-  "colorNeutral",
-  "colorSuccess",
-  "colorWarning",
-  "sizeSm",
-  "sizeMd",
-  "sizeLg",
-  "variantOutlined",
-  "variantSoft",
-  "variantSolid",
+const checkboxClasses: CheckboxClasses = generateUtilityClasses('RadCheckbox', [
+  'root',
+  'checkbox',
+  'action',
+  'input',
+  'label',
+  'checked',
+  'disabled',
+  'focusVisible',
+  'indeterminate',
+  'colorPrimary',
+  'colorDanger',
+  'colorInfo',
+  'colorNeutral',
+  'colorSuccess',
+  'colorWarning',
+  'colorContext',
+  'sizeSm',
+  'sizeMd',
+  'sizeLg',
+  'variantOutlined',
+  'variantSoft',
+  'variantSolid',
 ]);
 
 export default checkboxClasses;

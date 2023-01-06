@@ -1,4 +1,4 @@
-import { generateUtilityClass, generateUtilityClasses } from "../className";
+import { generateUtilityClass, generateUtilityClasses } from '../className';
 
 export interface CardCoverClasses {
   /** Styles applied to the root element. */
@@ -8,12 +8,9 @@ export interface CardCoverClasses {
 export type CardCoverClassKey = keyof CardCoverClasses;
 
 export function getCardCoverUtilityClass(slot: string): string {
-  return generateUtilityClass("RadCardCover", slot);
+  return generateUtilityClass('RadCardCover', slot);
 }
 
-const cardCoverClasses: CardCoverClasses = generateUtilityClasses(
-  "RadCardCover",
-  ["root"]
-);
+const cardCoverClasses: CardCoverClasses = generateUtilityClasses('RadCardCover', ['root']);
 
 export default cardCoverClasses;

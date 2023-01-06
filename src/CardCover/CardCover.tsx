@@ -19,7 +19,7 @@ const useUtilityClasses = () => {
 const CardCoverRoot = styled("div", {
   name: "RadCardCover",
   slot: "Root",
-  overridesResolver: (props, styles) => styles.root,
+  overridesResolver: (_props, styles) => styles.root,
 })<{ ownerState: CardCoverProps }>({
   position: "absolute",
   zIndex: 0,

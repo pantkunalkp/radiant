@@ -1,20 +1,17 @@
-import { unstable_composeClasses as composeClasses } from "@mui/base";
-import { OverridableComponent } from "@mui/types";
-import { unstable_capitalize as capitalize } from "@mui/utils";
-import clsx from "clsx";
-import PropTypes from "prop-types";
-import * as React from "react";
-import styled from "../styles/styled";
-import useThemeProps from "../styles/useThemeProps";
-import { getSvgIconUtilityClass } from "./svgIconClasses";
-import {
-  SvgIconProps,
-  SvgIconTypeMap,
-  SvgIconOwnerState,
-} from "./SvgIconProps";
+import { unstable_composeClasses as composeClasses } from '@mui/base';
+import { OverridableComponent } from '@mui/types';
+import { unstable_capitalize as capitalize } from '@mui/utils';
+import clsx from 'clsx';
+import PropTypes from 'prop-types';
+import * as React from 'react';
+import styled from '../styles/styled';
+import useThemeProps from '../styles/useThemeProps';
+import useSlot from '../utils/useSlot';
+import { getSvgIconUtilityClass } from './svgIconClasses';
+import { SvgIconProps, SvgIconTypeMap, SvgIconOwnerState } from './SvgIconProps';
 
 const useUtilityClasses = (ownerState: SvgIconOwnerState) => {
-  const { color, fontSize, classes } = ownerState;
+  const { color, fontSize } = ownerState;
 
   const slots = {
     root: [
@@ -24,7 +21,7 @@ const useUtilityClasses = (ownerState: SvgIconOwnerState) => {
     ],
   };
 
-  return composeClasses(slots, getSvgIconUtilityClass, classes);
+  return composeClasses(slots, getSvgIconUtilityClass, {});
 };
 
 const SvgIconRoot = styled("svg", {
@@ -90,22 +87,26 @@ const SvgIcon = React.forwardRef(function SvgIcon(inProps, ref) {
 
   const classes = useUtilityClasses(ownerState);
 
+  const [SlotRoot, rootProps] = useSlot('root', {
+    ref,
+    className: clsx(classes.root, className),
+    elementType: SvgIconRoot,
+    externalForwardedProps: { ...other, component },
+    ownerState,
+    additionalProps: {
+      color: htmlColor,
+      focusable: false,
+      ...(titleAccess && { role: 'img' }),
+      ...(!titleAccess && { 'aria-hidden': true }),
+      ...(!inheritViewBox && { viewBox }),
+    },
+  });
+
   return (
-    <SvgIconRoot
-      as={component}
-      className={clsx(classes.root, className)}
-      focusable="false"
-      color={htmlColor}
-      aria-hidden={titleAccess ? undefined : true}
-      role={titleAccess ? "img" : undefined}
-      ref={ref}
-      {...other}
-      {...(!inheritViewBox && { viewBox })}
-      ownerState={ownerState}
-    >
-      {children}
-      {titleAccess ? <title>{titleAccess}</title> : null}
-    </SvgIconRoot>
+    <SlotRoot {...rootProps}>
+    {children}
+    {titleAccess ? <title>{titleAccess}</title> : null}
+  </SlotRoot>
   );
 }) as OverridableComponent<SvgIconTypeMap>;
 
@@ -119,10 +120,6 @@ SvgIcon.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
-   * Override or extend the styles applied to the component.
-   */
-  classes: PropTypes.object,
-  /**
    * @ignore
    */
   className: PropTypes.string,
@@ -132,15 +129,7 @@ SvgIcon.propTypes /* remove-proptypes */ = {
    * @default 'inherit'
    */
   color: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf([
-      "danger",
-      "info",
-      "inherit",
-      "neutral",
-      "primary",
-      "success",
-      "warning",
-    ]),
+    PropTypes.oneOf(['danger', 'info', 'inherit', 'neutral', 'primary', 'success', 'warning']),
     PropTypes.string,
   ]),
   /**
@@ -153,20 +142,20 @@ SvgIcon.propTypes /* remove-proptypes */ = {
    * @default 'xl'
    */
   fontSize: PropTypes.oneOf([
-    "inherit",
-    "lg",
-    "md",
-    "sm",
-    "xl",
-    "xl2",
-    "xl3",
-    "xl4",
-    "xl5",
-    "xl6",
-    "xl7",
-    "xs",
-    "xs2",
-    "xs3",
+    'inherit',
+    'lg',
+    'md',
+    'sm',
+    'xl',
+    'xl2',
+    'xl3',
+    'xl4',
+    'xl5',
+    'xl6',
+    'xl7',
+    'xs',
+    'xs2',
+    'xs3',
   ]),
   /**
    * Applies a color attribute to the SVG element.
@@ -190,9 +179,7 @@ SvgIcon.propTypes /* remove-proptypes */ = {
    * The system prop that allows defining system overrides as well as additional CSS styles.
    */
   sx: PropTypes.oneOfType([
-    PropTypes.arrayOf(
-      PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])
-    ),
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
     PropTypes.func,
     PropTypes.object,
   ]),

@@ -1,85 +1,73 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import clsx from "clsx";
-import { OverridableComponent } from "@mui/types";
-import { unstable_composeClasses as composeClasses } from "@mui/base";
-import useThemeProps from "../styles/useThemeProps";
-import styled from "../styles/styled";
-import { DefaultColorScheme, ColorSystem } from "../styles/types";
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import clsx from 'clsx';
+import { OverridableComponent } from '@mui/types';
+import { unstable_composeClasses as composeClasses } from '@mui/base';
+import useThemeProps from '../styles/useThemeProps';
+import styled from '../styles/styled';
+import { DefaultColorScheme, ColorSystem } from '../styles/types';
 import {
   ScopedCssBaselineTypeMap,
   ScopedCssBaselineOwnerState,
   ScopedCssBaselineProps,
-} from "./ScopedCssBaselineProps";
-import { getScopedCssBaselineUtilityClass } from "./scopedCssBaselineClasses";
+} from './ScopedCssBaselineProps';
+import { getScopedCssBaselineUtilityClass } from './scopedCssBaselineClasses';
 
 const useUtilityClasses = () => {
   const slots = {
-    root: ["root"],
+    root: ['root'],
   };
 
   return composeClasses(slots, getScopedCssBaselineUtilityClass, {});
 };
 
-const ScopedCssBaselineRoot = styled("div", {
-  name: "RadScopedCssBaseline",
-  slot: "Root",
+const ScopedCssBaselineRoot = styled('div', {
+  name: 'RadScopedCssBaseline',
+  slot: 'Root',
   overridesResolver: (_props, styles) => styles.root,
 })<{ ownerState: ScopedCssBaselineOwnerState }>(({ theme, ownerState }) => {
   const colorSchemeStyles: Record<string, any> = {};
   if (!ownerState.disableColorScheme && theme.colorSchemes) {
-    (
-      Object.entries(theme.colorSchemes) as Array<
-        [DefaultColorScheme, ColorSystem]
-      >
-    ).forEach(([key, scheme]) => {
-      colorSchemeStyles[
-        `&${theme.getColorSchemeSelector(key).replace(/\s*&/, "")}`
-      ] = {
-        colorScheme: scheme.palette?.mode,
-      };
-    });
+    (Object.entries(theme.colorSchemes) as Array<[DefaultColorScheme, ColorSystem]>).forEach(
+      ([key, scheme]) => {
+        colorSchemeStyles[`&${theme.getColorSchemeSelector(key).replace(/\s*&/, '')}`] = {
+          colorScheme: scheme.palette?.mode,
+        };
+      },
+    );
   }
   return {
-    WebkitFontSmoothing: "antialiased",
-    MozOsxFontSmoothing: "grayscale",
+    WebkitFontSmoothing: 'antialiased',
+    MozOsxFontSmoothing: 'grayscale',
     // Change from `box-sizing: content-box` so that `width`
     // is not affected by `padding` or `border`.
-    boxSizing: "border-box",
+    boxSizing: 'border-box',
     // Fix font resize problem in iOS
-    WebkitTextSizeAdjust: "100%",
+    WebkitTextSizeAdjust: '100%',
     color: theme.vars.palette.text.primary,
-    ...theme.typography.body1,
+    ...(theme.typography.body1 as any),
     backgroundColor: theme.vars.palette.background.body,
-    "@media print": {
+    '@media print': {
       // Save printer ink.
       backgroundColor: theme.vars.palette.common.white,
     },
-    "& *, & *::before, & *::after": {
-      boxSizing: "inherit",
+    '& *, & *::before, & *::after': {
+      boxSizing: 'inherit',
     },
-    "& strong, & b": {
-      fontWeight: "bold",
+    '& strong, & b': {
+      fontWeight: 'bold',
     },
     ...colorSchemeStyles,
   };
 });
 
-const ScopedCssBaseline = React.forwardRef(function ScopedCssBaseline(
-  inProps,
-  ref
-) {
+const ScopedCssBaseline = React.forwardRef(function ScopedCssBaseline(inProps, ref) {
   const props = useThemeProps<typeof inProps & ScopedCssBaselineProps>({
     props: inProps,
-    name: "RadScopedCssBaseline",
+    name: 'RadScopedCssBaseline',
   });
 
-  const {
-    className,
-    component = "div",
-    disableColorScheme = false,
-    ...other
-  } = props;
+  const { className, component = 'div', disableColorScheme = false, ...other } = props;
 
   const ownerState = {
     ...props,
@@ -130,9 +118,7 @@ ScopedCssBaseline.propTypes /* remove-proptypes */ = {
    * The system prop that allows defining system overrides as well as additional CSS styles.
    */
   sx: PropTypes.oneOfType([
-    PropTypes.arrayOf(
-      PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])
-    ),
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
     PropTypes.func,
     PropTypes.object,
   ]),

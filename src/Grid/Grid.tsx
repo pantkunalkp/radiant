@@ -1,17 +1,16 @@
-import PropTypes from "prop-types";
-import { createGrid } from "@mui/system/Unstable_Grid";
-import { OverridableComponent } from "@mui/types";
-import { styled, useThemeProps } from "../styles";
-import { GridTypeMap } from "./GridProps";
+import PropTypes from 'prop-types';
+import { createGrid } from '@mui/system/Unstable_Grid';
+import { OverridableComponent } from '@mui/types';
+import { styled, useThemeProps } from '../styles';
+import { GridTypeMap } from './GridProps';
 
 const Grid = createGrid({
-  createStyledComponent: styled("div", {
-    name: "RadGrid",
+  createStyledComponent: styled('div', {
+    name: 'RadGrid',
     overridesResolver: (_props, styles) => styles.root,
   }),
-  componentName: "RadGrid",
-  useThemeProps: (inProps) =>
-    useThemeProps({ props: inProps, name: "JoyGrid" }),
+  componentName: 'RadGrid',
+  useThemeProps: (inProps) => useThemeProps({ props: inProps, name: 'RadGrid' }),
 }) as OverridableComponent<GridTypeMap>;
 
 Grid.propTypes /* remove-proptypes */ = {
@@ -27,9 +26,7 @@ Grid.propTypes /* remove-proptypes */ = {
    * @ignore
    */
   sx: PropTypes.oneOfType([
-    PropTypes.arrayOf(
-      PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])
-    ),
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
     PropTypes.func,
     PropTypes.object,
   ]),

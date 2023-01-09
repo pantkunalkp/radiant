@@ -1,50 +1,58 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import clsx from "clsx";
-import { OverridableComponent } from "@mui/types";
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import clsx from 'clsx';
+import { OverridableComponent } from '@mui/types';
 import {
+  unstable_capitalize as capitalize,
   unstable_useControlled as useControlled,
   unstable_useId as useId,
-} from "@mui/utils";
-import { unstable_composeClasses as composeClasses } from "@mui/base";
-import { styled, useThemeProps } from "../styles";
-import { getRadioGroupUtilityClass } from "./radioGroupClasses";
-import { RadioGroupProps, RadioGroupTypeMap } from "./RadioGroupProps";
-import RadioGroupContext from "./RadioGroupContext";
+} from '@mui/utils';
+import { unstable_composeClasses as composeClasses } from '@mui/base';
+import { styled, useThemeProps } from '../styles';
+import { getRadioGroupUtilityClass } from './radioGroupClasses';
+import { RadioGroupOwnerState, RadioGroupTypeMap } from './RadioGroupProps';
+import RadioGroupContext from './RadioGroupContext';
+import FormControlContext from '../FormControl/FormControlContext';
 
-const useUtilityClasses = (ownerState: RadioGroupProps) => {
-  const { row } = ownerState;
+const useUtilityClasses = (ownerState: RadioGroupOwnerState) => {
+  const { row, size, variant, color } = ownerState;
   const slots = {
-    root: ["root", row && "row"],
+    root: [
+      'root',
+      row && 'row',
+      variant && `variant${capitalize(variant)}`,
+      color && `color${capitalize(color)}`,
+      size && `size${capitalize(size)}`,
+    ],
   };
 
   return composeClasses(slots, getRadioGroupUtilityClass, {});
 };
 
-const RadioGroupRoot = styled("div", {
-  name: "RadRadioGroup",
-  slot: "Root",
-  overridesResolver: (props, styles) => styles.root,
-})<{ ownerState: RadioGroupProps }>(({ ownerState }) => ({
-  ...(ownerState.size === "sm" && {
-    "--RadioGroup-gap": "0.625rem",
+const RadioGroupRoot = styled('div', {
+  name: 'RadRadioGroup',
+  slot: 'Root',
+  overridesResolver: (_props, styles) => styles.root,
+})<{ ownerState: RadioGroupOwnerState }>(({ ownerState, theme }) => ({
+  ...(ownerState.size === 'sm' && {
+    '--RadioGroup-gap': '0.625rem',
   }),
-  ...(ownerState.size === "md" && {
-    "--RadioGroup-gap": "0.875rem",
+  ...(ownerState.size === 'md' && {
+    '--RadioGroup-gap': '0.875rem',
   }),
-  ...(ownerState.size === "lg" && {
-    "--RadioGroup-gap": "1.25rem",
+  ...(ownerState.size === 'lg' && {
+    '--RadioGroup-gap': '1.25rem',
   }),
-  display: "flex",
-  flexDirection: ownerState.row ? "row" : "column",
+  display: 'flex',
+  flexDirection: ownerState.row ? 'row' : 'column',
+  borderRadius: theme.vars.radius.sm,
+  ...theme.variants[ownerState.variant!]?.[ownerState.color!],
 }));
 
 const RadioGroup = React.forwardRef(function RadioGroup(inProps, ref) {
-  const props = useThemeProps<
-    typeof inProps & { component?: React.ElementType }
-  >({
+  const props = useThemeProps<typeof inProps & { component?: React.ElementType }>({
     props: inProps,
-    name: "RadRadioGroup",
+    name: 'RadRadioGroup',
   });
 
   const {
@@ -57,68 +65,94 @@ const RadioGroup = React.forwardRef(function RadioGroup(inProps, ref) {
     overlay,
     value: valueProp,
     onChange,
-    color,
-    variant,
-    size = "md",
+    color = 'neutral',
+    variant = 'plain',
+    size = 'md',
     row = false,
-    ...otherProps
+    role = 'radiogroup',
+    ...other
   } = props;
 
   const [value, setValueState] = useControlled({
     controlled: valueProp,
     default: defaultValue,
-    name: "RadioGroup",
+    name: 'RadioGroup',
   });
 
   const ownerState = {
     row,
     size,
+    variant,
+    color,
+    role,
     ...props,
   };
 
   const classes = useUtilityClasses(ownerState);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValueState(event.target.value);
-
-    if (onChange) {
-      onChange(event);
-    }
-  };
-
   const name = useId(nameProp);
 
+  const formControl = React.useContext(FormControlContext);
+
+  if (process.env.NODE_ENV !== 'production') {
+    const registerEffect = formControl?.registerEffect;
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    React.useEffect(() => {
+      if (registerEffect) {
+        return registerEffect();
+      }
+
+      return undefined;
+    }, [registerEffect]);
+  }
+
+  const contextValue = React.useMemo(
+    () => ({
+      disableIcon,
+      overlay,
+      row,
+      size,
+      name,
+      value,
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        setValueState(event.target.value);
+
+        if (onChange) {
+          onChange(event);
+        }
+      },
+    }),
+    [disableIcon, name, onChange, overlay, row, setValueState, size, value],
+  );
+
   return (
-    <RadioGroupContext.Provider
-      value={{
-        color,
-        disableIcon,
-        overlay,
-        row,
-        size,
-        variant,
-        name,
-        value,
-        onChange: handleChange,
-      }}
-    >
+    <RadioGroupContext.Provider value={contextValue}>
       <RadioGroupRoot
         ref={ref}
-        role="radiogroup"
-        {...otherProps}
+        role={role}
         as={component}
         ownerState={ownerState}
         className={clsx(classes.root, className)}
+        // The `id` is just for the completeness, it does not have any effect because RadioGroup (div) is non-labellable element
+        // MDN: "If it is not a labelable element, then the for attribute has no effect"
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label#attr-for
+        id={formControl?.htmlFor}
+        aria-labelledby={formControl?.labelId}
+        aria-describedby={formControl?.['aria-describedby']}
+        {...other}
       >
-        {React.Children.map(children, (child, index) =>
-          React.isValidElement(child)
-            ? React.cloneElement(child, {
-                // to let Radio knows when to apply margin(Inline|Block)Start
-                ...(index === 0 && { "data-first-child": "" }),
-                "data-parent": "RadioGroup",
-              })
-            : child
-        )}
+        <FormControlContext.Provider value={undefined}>
+          {React.Children.map(children, (child, index) =>
+            React.isValidElement(child)
+              ? React.cloneElement(child, {
+                  // to let Radio knows when to apply margin(Inline|Block)Start
+                  ...(index === 0 && { 'data-first-child': '' }),
+                  ...(index === React.Children.count(children) - 1 && { 'data-last-child': '' }),
+                  'data-parent': 'RadioGroup',
+                } as Record<string, string>)
+              : child,
+          )}
+        </FormControlContext.Provider>
       </RadioGroupRoot>
     </RadioGroupContext.Provider>
   );
@@ -141,7 +175,7 @@ RadioGroup.propTypes /* remove-proptypes */ = {
    * The color of the component. It supports those theme colors that make sense for this component.
    */
   color: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["danger", "info", "primary", "success", "warning"]),
+    PropTypes.oneOf(['danger', 'info', 'primary', 'success', 'warning']),
     PropTypes.string,
   ]),
   /**
@@ -174,6 +208,10 @@ RadioGroup.propTypes /* remove-proptypes */ = {
    */
   overlay: PropTypes.bool,
   /**
+   * @ignore
+   */
+  role: PropTypes /* @typescript-to-proptypes-ignore */.string,
+  /**
    * If `true`, flex direction is set to 'row'.
    * @default false
    */
@@ -183,16 +221,14 @@ RadioGroup.propTypes /* remove-proptypes */ = {
    * @default 'md'
    */
   size: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["sm", "md", "lg"]),
+    PropTypes.oneOf(['sm', 'md', 'lg']),
     PropTypes.string,
   ]),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.
    */
   sx: PropTypes.oneOfType([
-    PropTypes.arrayOf(
-      PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])
-    ),
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
     PropTypes.func,
     PropTypes.object,
   ]),
@@ -204,7 +240,7 @@ RadioGroup.propTypes /* remove-proptypes */ = {
    * The variant to use.
    */
   variant: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-    PropTypes.oneOf(["outlined", "plain", "soft", "solid"]),
+    PropTypes.oneOf(['outlined', 'plain', 'soft', 'solid']),
     PropTypes.string,
   ]),
 } as any;

@@ -1,40 +1,25 @@
 import {
   unstable_generateUtilityClass as generateUtilityClass,
   unstable_generateUtilityClasses as generateUtilityClasses,
-} from "@mui/utils";
-import { GridClasses } from "@mui/system/Unstable_Grid";
+} from '@mui/utils';
+import { GridClasses } from '@mui/system/Unstable_Grid';
 
 export type GridClassKey = keyof GridClasses;
 
 export function getGridUtilityClass(slot: string): string {
-  return generateUtilityClass("RadGrid", slot);
+  return generateUtilityClass('RadGrid', slot);
 }
 
 const SPACINGS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
-const DIRECTIONS = ["column-reverse", "column", "row-reverse", "row"] as const;
-const WRAPS = ["nowrap", "wrap-reverse", "wrap"] as const;
-const GRID_SIZES = [
-  "auto",
-  true,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-  8,
-  9,
-  10,
-  11,
-  12,
-] as const;
+const DIRECTIONS = ['column-reverse', 'column', 'row-reverse', 'row'] as const;
+const WRAPS = ['nowrap', 'wrap-reverse', 'wrap'] as const;
+const GRID_SIZES = ['auto', true, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 
-const gridClasses: GridClasses = generateUtilityClasses("RadGrid", [
-  "root",
-  "container",
-  "item",
-  "zeroMinWidth",
+const gridClasses: GridClasses = generateUtilityClasses('RadGrid', [
+  'root',
+  'container',
+  'item',
+  'zeroMinWidth',
 
   // spacings
   ...SPACINGS.map((spacing) => `spacing-xs-${spacing}` as const),

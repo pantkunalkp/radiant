@@ -1,12 +1,9 @@
-import { OverrideProps } from "@mui/types";
-import { SxProps } from "../styles/types";
+import { OverrideProps } from '@mui/types';
+import { SxProps } from '../styles/types';
 
-export type ScopedCssBaselineSlot = "root";
+export type ScopedCssBaselineSlot = 'root';
 
-export interface ScopedCssBaselineTypeMap<
-  P = {},
-  D extends React.ElementType = "div"
-> {
+export interface ScopedCssBaselineTypeMap<P = {}, D extends React.ElementType = 'div'> {
   props: P & {
     /**
      * You can wrap a node.
@@ -29,8 +26,8 @@ export interface ScopedCssBaselineTypeMap<
 }
 
 export type ScopedCssBaselineProps<
-  D extends React.ElementType = ScopedCssBaselineTypeMap["defaultComponent"],
-  P = { component?: React.ElementType }
+  D extends React.ElementType = ScopedCssBaselineTypeMap['defaultComponent'],
+  P = { component?: React.ElementType },
 > = OverrideProps<ScopedCssBaselineTypeMap<P, D>, D>;
 
 export interface ScopedCssBaselineOwnerState extends ScopedCssBaselineProps {}

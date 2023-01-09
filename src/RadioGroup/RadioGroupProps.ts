@@ -1,14 +1,11 @@
-import * as React from "react";
-import { OverrideProps } from "@mui/types";
-import { RadioProps } from "../Radio/RadioProps";
-import { SxProps } from "../styles/types";
+import * as React from 'react';
+import { OverrideProps } from '@mui/types';
+import { RadioProps } from '../Radio/RadioProps';
+import { SxProps } from '../styles/types';
 
-export type RadioGroupSlot = "root";
+export type RadioGroupSlot = 'root';
 
-export interface RadioGroupTypeMap<
-  P = {},
-  D extends React.ElementType = "div"
-> {
+export interface RadioGroupTypeMap<P = {}, D extends React.ElementType = 'div'> {
   props: P & {
     /**
      * Class name applied to the root element.
@@ -22,7 +19,7 @@ export interface RadioGroupTypeMap<
     /**
      * The color of the component. It supports those theme colors that make sense for this component.
      */
-    color?: RadioProps["color"];
+    color?: RadioProps['color'];
     /**
      * The default value. Use when the component is not controlled.
      */
@@ -56,7 +53,7 @@ export interface RadioGroupTypeMap<
      * The size of the component.
      * @default 'md'
      */
-    size?: RadioProps["size"];
+    size?: RadioProps['size'];
     /**
      * The system prop that allows defining system overrides as well as additional CSS styles.
      */
@@ -68,14 +65,16 @@ export interface RadioGroupTypeMap<
     /**
      * The variant to use.
      */
-    variant?: RadioProps["variant"];
+    variant?: RadioProps['variant'];
   };
   defaultComponent: D;
 }
 
 export type RadioGroupProps<
-  D extends React.ElementType = RadioGroupTypeMap["defaultComponent"],
+  D extends React.ElementType = RadioGroupTypeMap['defaultComponent'],
   P = {
     component?: React.ElementType;
-  }
+  },
 > = OverrideProps<RadioGroupTypeMap<P, D>, D>;
+
+export interface RadioGroupOwnerState extends RadioGroupProps {}
